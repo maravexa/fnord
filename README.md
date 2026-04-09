@@ -163,4 +163,4 @@ Valid `date` values: `st-tibs`, `chaos-5`, `discord-50`, `confusion-23`, etc.
 
 WTFPL — see [LICENSE](LICENSE).
 
-*A Discordian calendar and chaos utility. All Hail Eris. Warning; Contains 5 tons of flax.*
+*A Discordian calendar and chaos utility. All Hail Eris. Contains 5 tons of flax.*
