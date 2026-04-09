@@ -4,6 +4,7 @@ pub mod chaos;
 pub mod date;
 pub mod erisian;
 pub mod fortune;
+pub mod holyday;
 pub mod hotdog;
 pub mod koan;
 pub mod law;

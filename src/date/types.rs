@@ -246,7 +246,10 @@ mod tests {
             day: 1,
             weekday: Weekday::Sweetmorn,
         };
-        assert_eq!(d.to_string(), "Sweetmorn, the 1st of Chaos, in the YOLD 3191");
+        assert_eq!(
+            d.to_string(),
+            "Sweetmorn, the 1st of Chaos, in the YOLD 3191"
+        );
     }
 
     #[test]

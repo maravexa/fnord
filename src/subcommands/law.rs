@@ -2,7 +2,6 @@
 //! applies the Law of Fives to the match count.
 
 use std::io::{self, Read};
-use std::path::PathBuf;
 
 use serde_json::json;
 
@@ -30,7 +29,13 @@ pub fn run(args: &LawArgs, _config: &Config, json_out: bool) -> Result<(), Fnord
         }
     }
 
-    let matches = search_all(&sources, &args.pattern, args.ignore_case, args.word, args.invert);
+    let matches = search_all(
+        &sources,
+        &args.pattern,
+        args.ignore_case,
+        args.word,
+        args.invert,
+    );
     let file_count = sources.len();
 
     if json_out {
@@ -61,12 +66,20 @@ pub fn run(args: &LawArgs, _config: &Config, json_out: bool) -> Result<(), Fnord
 
     if !args.no_law {
         println!();
-        println!("  {} matches found in {} file{}.", matches.len(), file_count, if file_count == 1 { "" } else { "s" });
+        println!(
+            "  {} matches found in {} file{}.",
+            matches.len(),
+            file_count,
+            if file_count == 1 { "" } else { "s" }
+        );
         println!();
         println!("  LAW OF FIVES ANALYSIS:");
         println!("  {}", apply_law_of_fives(matches.len()));
         let n_str = matches.len().to_string();
-        let fives_in_count = n_str.chars().filter(|c| *c == '5' || *c == 'f' || *c == 'F').count();
+        let fives_in_count = n_str
+            .chars()
+            .filter(|c| *c == '5' || *c == 'f' || *c == 'F')
+            .count();
         println!(
             "  The digit/letter five appears {} times in \"{}\". {}",
             fives_in_count,
@@ -78,7 +91,7 @@ pub fn run(args: &LawArgs, _config: &Config, json_out: bool) -> Result<(), Fnord
     Ok(())
 }
 
-fn display_name(p: &PathBuf) -> String {
+fn display_name(p: &std::path::Path) -> String {
     p.display().to_string()
 }
 
@@ -169,15 +182,11 @@ pub fn apply_law_of_fives(n: usize) -> String {
         "Zero matches. Zero is five minus five. The Law holds.".to_string()
     } else if n == 5 {
         "Five matches. The Law of Fives is self-evident.".to_string()
-    } else if n % 5 == 0 {
+    } else if n.is_multiple_of(5) {
         "Divisible by five. The Law of Fives is satisfied.".to_string()
     } else {
         let nearest_five = (((n as f64) / 5.0).round() * 5.0) as usize;
-        let dist = if nearest_five > n {
-            nearest_five - n
-        } else {
-            n - nearest_five
-        };
+        let dist = nearest_five.abs_diff(n);
         format!("{n} matches. {n} is {dist} away from {nearest_five}. The Law of Fives remains true in spirit.")
     }
 }

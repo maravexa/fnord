@@ -8,7 +8,7 @@ pub enum HolydayKey {
 }
 
 impl HolydayKey {
-    pub fn from_str(s: &str) -> Result<Self, FnordError> {
+    pub fn parse(s: &str) -> Result<Self, FnordError> {
         if s.eq_ignore_ascii_case("st-tibs") || s.eq_ignore_ascii_case("st_tibs") {
             return Ok(HolydayKey::StTibs);
         }
@@ -25,11 +25,7 @@ impl HolydayKey {
             "confusion" => Season::Confusion,
             "bureaucracy" => Season::Bureaucracy,
             "aftermath" => Season::Aftermath,
-            other => {
-                return Err(FnordError::Parse(format!(
-                    "unknown season: '{other}'"
-                )))
-            }
+            other => return Err(FnordError::Parse(format!("unknown season: '{other}'"))),
         };
         if !(1..=73).contains(&day) {
             return Err(FnordError::Parse(format!(
@@ -90,7 +86,7 @@ fn default_recurring() -> bool {
 impl PersonalHolydayEntry {
     #[allow(dead_code)]
     pub fn into_holyday(self, source: HolydaySource) -> Result<Holyday, FnordError> {
-        let key = HolydayKey::from_str(&self.date)?;
+        let key = HolydayKey::parse(&self.date)?;
         Ok(Holyday {
             key,
             name: self.name,

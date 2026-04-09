@@ -21,7 +21,8 @@ impl ZodiacSystem for Vedic {
         s.system = "vedic";
         s.system_label = "Vedic";
         s.tagline = format!("{} (sidereal / Vedic)", s.tagline);
-        s.extras.push(("ayanamsa".to_string(), "23.85°".to_string()));
+        s.extras
+            .push(("ayanamsa".to_string(), "23.85°".to_string()));
         s
     }
 }

@@ -15,3 +15,7 @@
 
 # Build artifacts
 *.pdb
+
+# Generated assets (man pages and shell completions)
+/man/
+/completions/

@@ -133,7 +133,12 @@ fn render(reading: &WeatherReading, disc: &DiscordianWeather, opts: RenderOpts<'
             day,
             weekday,
             ..
-        } => format!("{} {}, {}", season.to_string().to_uppercase(), day, weekday.to_string().to_uppercase()),
+        } => format!(
+            "{} {}, {}",
+            season.to_string().to_uppercase(),
+            day,
+            weekday.to_string().to_uppercase()
+        ),
         DiscordianDate::StTibsDay { .. } => "ST. TIB'S DAY".to_string(),
     };
 
@@ -144,7 +149,11 @@ fn render(reading: &WeatherReading, disc: &DiscordianWeather, opts: RenderOpts<'
     } else {
         println!("{}", heading.bold().cyan());
     }
-    let flag = if generative { " (generative)" } else { " (live)" };
+    let flag = if generative {
+        " (generative)"
+    } else {
+        " (live)"
+    };
     println!("  Location: {}{}", reading.location, flag);
     println!();
 
@@ -171,7 +180,10 @@ fn render(reading: &WeatherReading, disc: &DiscordianWeather, opts: RenderOpts<'
             "  {glyph}  {} — {:.1} mm precipitation expected",
             reading.description, reading.precip_mm
         );
-        println!("  Temperature: {:.1}°C ({:.1}°F)", reading.temp_c, reading.temp_f);
+        println!(
+            "  Temperature: {:.1}°C ({:.1}°F)",
+            reading.temp_c, reading.temp_f
+        );
         println!("  Humidity: {:.0}%", reading.humidity);
         println!(
             "  Winds: {:.1} km/h from the {}",
@@ -347,11 +359,11 @@ pub fn generative_weather(date: NaiveDate, location: &str) -> WeatherReading {
 
     // Temperature bounds (°C) per season.
     let (temp_min_c, temp_max_c) = match season {
-        Season::Chaos => (-5.0, 10.0),       // Jan–Mar: cold
-        Season::Discord => (5.0, 22.0),      // Mar–May: spring
-        Season::Confusion => (15.0, 32.0),   // May–Aug: summer
-        Season::Bureaucracy => (8.0, 25.0),  // Aug–Oct: autumn
-        Season::Aftermath => (-3.0, 15.0),   // Oct–Dec: cold
+        Season::Chaos => (-5.0, 10.0),      // Jan–Mar: cold
+        Season::Discord => (5.0, 22.0),     // Mar–May: spring
+        Season::Confusion => (15.0, 32.0),  // May–Aug: summer
+        Season::Bureaucracy => (8.0, 25.0), // Aug–Oct: autumn
+        Season::Aftermath => (-3.0, 15.0),  // Oct–Dec: cold
     };
 
     let temp_c = temp_min_c + sample_unit(&mut s) * (temp_max_c - temp_min_c);

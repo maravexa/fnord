@@ -157,10 +157,7 @@ fn date_lines(disc: &DiscordianDate) -> (String, String) {
                 format!("of {season}, YOLD {year}"),
             )
         }
-        DiscordianDate::StTibsDay { year } => (
-            "St. Tib's Day".to_string(),
-            format!("YOLD {year}"),
-        ),
+        DiscordianDate::StTibsDay { year } => ("St. Tib's Day".to_string(), format!("YOLD {year}")),
     }
 }
 

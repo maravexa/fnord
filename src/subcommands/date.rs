@@ -10,6 +10,11 @@ use crate::holydays::defaults::builtin_holydays;
 use crate::holydays::registry::HolydayRegistry;
 
 pub fn run(args: &DateArgs, config: &Config, json: bool, no_color: bool) -> Result<(), FnordError> {
+    if args.help_format {
+        print_format_help();
+        return Ok(());
+    }
+
     let naive_date = match &args.date {
         Some(s) => parse_date_arg(s)?,
         None => Local::now().date_naive(),
@@ -60,7 +65,11 @@ fn format_date_line(disc: &DiscordianDate, _no_color: bool) -> String {
     disc.to_string()
 }
 
-fn apply_format(fmt: &str, disc: &DiscordianDate, holydays: &[&crate::holydays::types::Holyday]) -> String {
+fn apply_format(
+    fmt: &str,
+    disc: &DiscordianDate,
+    holydays: &[&crate::holydays::types::Holyday],
+) -> String {
     let holyday_name = holydays.first().map(|h| h.name.as_str()).unwrap_or("");
     let apostle = get_apostle(disc).unwrap_or_default();
 
@@ -116,7 +125,41 @@ fn get_apostle(disc: &DiscordianDate) -> Option<String> {
     }
 }
 
-fn print_json(disc: &DiscordianDate, holydays: &[&crate::holydays::types::Holyday]) -> Result<(), FnordError> {
+fn print_format_help() {
+    println!();
+    println!("  fnord date FORMAT TOKENS");
+    println!("  {}", "═".repeat(40));
+    println!();
+    println!("  %A    Weekday name           (Pungenday)");
+    println!("  %B    Season name            (Confusion)");
+    println!("  %d    Day of season, numeric (23)");
+    println!("  %e    Day of season, ordinal (23rd)");
+    println!("  %Y    YOLD year              (3192)");
+    println!("  %H    Holyday name           (Confuflux, or empty)");
+    println!("  %a    Apostle name           (Sri Syadasti)");
+    println!("  %n    Newline");
+    println!("  %t    Tab");
+    println!("  %%    Literal percent sign");
+    println!();
+    println!("  EXAMPLES:");
+    println!("  fnord date --format \"%A, the %e of %B, YOLD %Y\"");
+    println!("  → Pungenday, the 23rd of Confusion, YOLD 3192");
+    println!();
+    println!("  fnord date --format \"%d %B %Y\"");
+    println!("  → 23 Confusion 3192");
+    println!();
+    println!("  fnord date --format \"Today is %H\" (on a holyday)");
+    println!("  → Today is Confuflux");
+    println!();
+    println!("  fnord date --format \"Today is %H\" (not a holyday)");
+    println!("  → Today is");
+    println!();
+}
+
+fn print_json(
+    disc: &DiscordianDate,
+    holydays: &[&crate::holydays::types::Holyday],
+) -> Result<(), FnordError> {
     let obj = match disc {
         DiscordianDate::StTibsDay { year } => json!({
             "type": "st_tibs_day",

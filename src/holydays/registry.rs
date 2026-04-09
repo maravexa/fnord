@@ -24,7 +24,10 @@ impl HolydayRegistry {
             // Non-recurring without year: ignore (malformed)
         }
 
-        HolydayRegistry { recurring, one_time }
+        HolydayRegistry {
+            recurring,
+            one_time,
+        }
     }
 
     pub fn lookup(&self, date: &DiscordianDate) -> Vec<&Holyday> {
@@ -58,7 +61,13 @@ mod tests {
     use crate::holydays::defaults::builtin_holydays;
     use crate::holydays::types::HolydaySource;
 
-    fn make_holyday(key: HolydayKey, name: &str, source: HolydaySource, recurring: bool, year: Option<i32>) -> Holyday {
+    fn make_holyday(
+        key: HolydayKey,
+        name: &str,
+        source: HolydaySource,
+        recurring: bool,
+        year: Option<i32>,
+    ) -> Holyday {
         Holyday {
             key,
             name: name.to_string(),
@@ -95,7 +104,13 @@ mod tests {
             season: Season::Chaos,
             day: 5,
         };
-        let personal = vec![make_holyday(key, "My Custom Chaos 5", HolydaySource::Personal, true, None)];
+        let personal = vec![make_holyday(
+            key,
+            "My Custom Chaos 5",
+            HolydaySource::Personal,
+            true,
+            None,
+        )];
         let registry = HolydayRegistry::build(builtin_holydays(), vec![], personal);
         let date = chaos5_date(3191);
         let results = registry.lookup(&date);
@@ -110,7 +125,13 @@ mod tests {
             season: Season::Chaos,
             day: 5,
         };
-        let cabal = vec![make_holyday(key, "Cabal Chaos 5", HolydaySource::Cabal, true, None)];
+        let cabal = vec![make_holyday(
+            key,
+            "Cabal Chaos 5",
+            HolydaySource::Cabal,
+            true,
+            None,
+        )];
         let registry = HolydayRegistry::build(builtin_holydays(), cabal, vec![]);
         let date = chaos5_date(3191);
         let results = registry.lookup(&date);
@@ -124,8 +145,20 @@ mod tests {
             season: Season::Chaos,
             day: 5,
         };
-        let cabal = vec![make_holyday(key.clone(), "Cabal Version", HolydaySource::Cabal, true, None)];
-        let personal = vec![make_holyday(key, "Personal Version", HolydaySource::Personal, true, None)];
+        let cabal = vec![make_holyday(
+            key.clone(),
+            "Cabal Version",
+            HolydaySource::Cabal,
+            true,
+            None,
+        )];
+        let personal = vec![make_holyday(
+            key,
+            "Personal Version",
+            HolydaySource::Personal,
+            true,
+            None,
+        )];
         let registry = HolydayRegistry::build(builtin_holydays(), cabal, personal);
         let date = chaos5_date(3191);
         let results = registry.lookup(&date);
@@ -138,7 +171,13 @@ mod tests {
             season: Season::Discord,
             day: 5,
         };
-        let personal = vec![make_holyday(key, "The Incident", HolydaySource::Personal, false, Some(3191))];
+        let personal = vec![make_holyday(
+            key,
+            "The Incident",
+            HolydaySource::Personal,
+            false,
+            Some(3191),
+        )];
         let registry = HolydayRegistry::build(builtin_holydays(), vec![], personal);
 
         let date_matching = DiscordianDate::SeasonDay {
@@ -171,7 +210,13 @@ mod tests {
             season: Season::Chaos,
             day: 5,
         };
-        let personal = vec![make_holyday(key, "One Time Only", HolydaySource::Personal, false, Some(3191))];
+        let personal = vec![make_holyday(
+            key,
+            "One Time Only",
+            HolydaySource::Personal,
+            false,
+            Some(3191),
+        )];
         let registry = HolydayRegistry::build(builtin_holydays(), vec![], personal);
 
         let date_3190 = chaos5_date(3190);

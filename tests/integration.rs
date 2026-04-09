@@ -42,10 +42,7 @@ fn test_date_st_tibs() {
 
 #[test]
 fn test_date_short_exits_zero() {
-    fnord()
-        .args(["date", "--short"])
-        .assert()
-        .success();
+    fnord().args(["date", "--short"]).assert().success();
 }
 
 #[test]
@@ -307,7 +304,10 @@ fn fortune_count_returns_n() {
     let s = String::from_utf8(output).unwrap();
     // 3 fortunes separated by "%\n" means 2 separators.
     let separators = s.lines().filter(|l| *l == "%").count();
-    assert_eq!(separators, 2, "expected 2 separators for 3 fortunes, got {separators}: {s}");
+    assert_eq!(
+        separators, 2,
+        "expected 2 separators for 3 fortunes, got {separators}: {s}"
+    );
 }
 
 #[test]
@@ -608,21 +608,11 @@ fn log_writes_entry_to_tempfile() {
 fn log_list_exits_zero() {
     let path = temp_grimoire_path("list-grimoire");
     fnord()
-        .args([
-            "log",
-            "first entry",
-            "--file",
-            path.to_str().unwrap(),
-        ])
+        .args(["log", "first entry", "--file", path.to_str().unwrap()])
         .assert()
         .success();
     fnord()
-        .args([
-            "log",
-            "second entry",
-            "--file",
-            path.to_str().unwrap(),
-        ])
+        .args(["log", "second entry", "--file", path.to_str().unwrap()])
         .assert()
         .success();
     fnord()
@@ -657,13 +647,7 @@ fn log_json_list_is_valid_json() {
         .assert()
         .success();
     let output = fnord()
-        .args([
-            "log",
-            "--list",
-            "--file",
-            path.to_str().unwrap(),
-            "--json",
-        ])
+        .args(["log", "--list", "--file", path.to_str().unwrap(), "--json"])
         .assert()
         .success()
         .get_output()
@@ -775,4 +759,177 @@ fn pineal_raw_exits_zero() {
         .assert()
         .success()
         .stdout(predicate::str::contains("raw system values"));
+}
+
+// ─── holyday subcommand ────────────────────────────────────────────────────────
+
+#[test]
+fn holyday_list_exits_zero() {
+    fnord()
+        .args(["holyday", "list"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Mungday"));
+}
+
+#[test]
+fn holyday_show_exits_zero() {
+    fnord().args(["holyday", "show"]).assert().success();
+}
+
+#[test]
+fn holyday_list_json_is_valid_json() {
+    let output = fnord()
+        .args(["holyday", "list", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    let arr = v.as_array().expect("expected array");
+    assert!(!arr.is_empty());
+    assert!(arr[0].get("key").is_some());
+    assert!(arr[0].get("name").is_some());
+}
+
+// ─── format strings ────────────────────────────────────────────────────────────
+
+#[test]
+fn date_format_weekday_token() {
+    // %A should produce a weekday name
+    let output = fnord()
+        .args(["date", "--date", "2025-01-01", "--format", "%A"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    assert!(
+        [
+            "Sweetmorn",
+            "Boomtime",
+            "Pungenday",
+            "Prickle-Prickle",
+            "Setting Orange"
+        ]
+        .iter()
+        .any(|w| s.contains(w)),
+        "%A did not produce a weekday name: {s}"
+    );
+}
+
+#[test]
+fn date_format_season_token() {
+    let output = fnord()
+        .args(["date", "--date", "2025-01-01", "--format", "%B"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    assert!(
+        ["Chaos", "Discord", "Confusion", "Bureaucracy", "Aftermath"]
+            .iter()
+            .any(|w| s.contains(w)),
+        "%B did not produce a season name: {s}"
+    );
+}
+
+#[test]
+fn date_format_year_token() {
+    let output = fnord()
+        .args(["date", "--date", "2025-01-01", "--format", "%Y"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    assert!(s.contains("3191"), "%Y did not produce YOLD 3191: {s}");
+}
+
+#[test]
+fn date_help_format_exits_zero() {
+    fnord()
+        .args(["date", "--help-format"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("FORMAT TOKENS"))
+        .stdout(predicate::str::contains("%A"))
+        .stdout(predicate::str::contains("%Y"));
+}
+
+// ─── shell completions binary ──────────────────────────────────────────────────
+
+#[test]
+fn generate_completions_binary_exists() {
+    // The binary is only built with --features generate-assets,
+    // so we just verify the source file is present.
+    assert!(
+        std::path::Path::new("src/bin/generate-completions.rs").exists(),
+        "generate-completions source not found"
+    );
+}
+
+// ─── global flags ──────────────────────────────────────────────────────────────
+
+#[test]
+fn no_color_flag_produces_no_ansi() {
+    let output = fnord().args(["--no-color", "date"]).output().unwrap();
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        !stdout.contains('\x1B'),
+        "output contains ANSI codes despite --no-color"
+    );
+}
+
+#[test]
+fn no_unicode_flag_produces_no_unicode() {
+    let output = fnord().args(["--no-unicode", "wake"]).output().unwrap();
+    assert!(output.status.success());
+    // Output should not contain box-drawing characters (U+2500+)
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let has_box_drawing = stdout
+        .chars()
+        .any(|c| ('\u{2500}'..='\u{257F}').contains(&c));
+    assert!(
+        !has_box_drawing,
+        "output contains box-drawing chars despite --no-unicode"
+    );
+}
+
+#[test]
+fn json_flag_on_date_is_valid_json() {
+    let output = fnord()
+        .args(["--json", "date"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON from --json date");
+    assert!(v.get("year").is_some());
+}
+
+#[test]
+fn version_flag_exits_zero() {
+    fnord()
+        .arg("--version")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("0.1.0"));
+}
+
+#[test]
+fn help_flag_exits_zero() {
+    fnord()
+        .arg("--help")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("fnord"));
 }
