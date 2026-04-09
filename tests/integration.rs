@@ -121,7 +121,7 @@ fn test_cal_specific_season() {
 
 #[test]
 fn test_stub_subcommands() {
-    for sub in &["log", "wake", "pineal", "fnord", "hotdog", "cabbage", "chaos"] {
+    for sub in &["fnord", "hotdog", "cabbage", "chaos"] {
         fnord()
             .arg(sub)
             .assert()
@@ -538,4 +538,205 @@ fn omens_json_is_valid_json() {
     assert!(v.get("discordian").is_some());
     assert!(v.get("interpretation").is_some());
     assert!(v.get("directive").is_some());
+}
+
+// ─── log ───────────────────────────────────────────────────────────────────
+
+fn temp_grimoire_path(name: &str) -> std::path::PathBuf {
+    // Deliberately leak the TempDir handle so the directory outlives the
+    // test; each test creates a unique directory so there's no collision.
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join(name);
+    std::mem::forget(dir);
+    path
+}
+
+#[test]
+fn log_writes_entry_to_tempfile() {
+    let path = temp_grimoire_path("grimoire");
+    fnord()
+        .args([
+            "log",
+            "Test entry for the grimoire",
+            "--file",
+            path.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+    let content = std::fs::read_to_string(&path).unwrap();
+    assert!(content.contains("Test entry for the grimoire"));
+    assert!(content.contains("YOLD"));
+}
+
+#[test]
+fn log_list_exits_zero() {
+    let path = temp_grimoire_path("list-grimoire");
+    fnord()
+        .args([
+            "log",
+            "first entry",
+            "--file",
+            path.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+    fnord()
+        .args([
+            "log",
+            "second entry",
+            "--file",
+            path.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+    fnord()
+        .args(["log", "--list", "--file", path.to_str().unwrap()])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("second entry"));
+}
+
+#[test]
+fn log_creates_file_if_not_exists() {
+    let path = temp_grimoire_path("nested/path/grimoire");
+    fnord()
+        .args(["log", "hello", "--file", path.to_str().unwrap()])
+        .assert()
+        .success();
+    assert!(path.exists());
+    let content = std::fs::read_to_string(&path).unwrap();
+    assert!(content.contains("# Grimoire of "));
+    assert!(content.contains("hello"));
+}
+
+#[test]
+fn log_json_list_is_valid_json() {
+    let path = temp_grimoire_path("json-grimoire");
+    fnord()
+        .args(["log", "one", "--file", path.to_str().unwrap()])
+        .assert()
+        .success();
+    fnord()
+        .args(["log", "two", "--file", path.to_str().unwrap()])
+        .assert()
+        .success();
+    let output = fnord()
+        .args([
+            "log",
+            "--list",
+            "--file",
+            path.to_str().unwrap(),
+            "--json",
+        ])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    let arr = v.as_array().expect("expected array");
+    assert!(arr.len() >= 2);
+    assert!(arr[0].get("index").is_some());
+    assert!(arr[0].get("discordian_date").is_some());
+    assert!(arr[0].get("body").is_some());
+}
+
+// ─── wake ──────────────────────────────────────────────────────────────────
+
+#[test]
+fn wake_exits_zero() {
+    fnord()
+        .arg("wake")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("All Hail Eris"));
+}
+
+#[test]
+fn wake_with_fortune_exits_zero() {
+    fnord()
+        .args(["wake", "--fortune"])
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+}
+
+#[test]
+fn wake_json_is_valid_json() {
+    let output = fnord()
+        .args(["wake", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    assert!(v.get("discordian_date").is_some());
+    assert!(v.get("date_lines").is_some());
+}
+
+#[test]
+fn wake_no_unicode_exits_zero() {
+    fnord()
+        .args(["wake", "--no-unicode"])
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+}
+
+// ─── pineal ────────────────────────────────────────────────────────────────
+
+#[test]
+fn pineal_exits_zero() {
+    fnord()
+        .arg("pineal")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("PINEAL REPORT"));
+}
+
+#[test]
+fn pineal_minimal_exits_zero() {
+    fnord()
+        .args(["pineal", "--verbosity", "minimal"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("/100"));
+}
+
+#[test]
+fn pineal_enlightened_exits_zero() {
+    fnord()
+        .args(["pineal", "--verbosity", "enlightened"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("PROPHECY"));
+}
+
+#[test]
+fn pineal_json_is_valid_json() {
+    let output = fnord()
+        .args(["pineal", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    assert!(v.get("host").is_some());
+    assert!(v.get("consciousness").is_some());
+    assert!(v.get("uptime_seconds").is_some());
+    assert!(v.get("memory").is_some());
+}
+
+#[test]
+fn pineal_raw_exits_zero() {
+    fnord()
+        .args(["pineal", "--raw"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("raw system values"));
 }
