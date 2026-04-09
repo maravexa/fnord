@@ -121,7 +121,7 @@ fn test_cal_specific_season() {
 
 #[test]
 fn test_stub_subcommands() {
-    for sub in &["moon", "zodiac"] {
+    for sub in &["log", "wake", "pineal", "fnord", "hotdog", "cabbage", "chaos"] {
         fnord()
             .arg(sub)
             .assert()
@@ -352,4 +352,190 @@ fn koan_json_is_valid_json() {
     assert!(arr[0].get("setup").is_some());
     assert!(arr[0].get("question").is_some());
     assert!(arr[0].get("response").is_some());
+}
+
+// ─── moon ──────────────────────────────────────────────────────────────────
+
+#[test]
+fn moon_exits_zero() {
+    fnord()
+        .arg("moon")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+}
+
+#[test]
+fn moon_phobos_exits_zero() {
+    fnord()
+        .args(["moon", "--body", "phobos"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Phobos"));
+}
+
+#[test]
+fn moon_next_exits_zero() {
+    fnord()
+        .args(["moon", "--body", "titan", "--next"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Next full moon"))
+        .stdout(predicate::str::contains("Next new moon"));
+}
+
+#[test]
+fn moon_json_is_valid_json() {
+    let output = fnord()
+        .args(["moon", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    assert!(v.get("body").is_some());
+    assert!(v.get("phase_name").is_some());
+    assert!(v.get("phase_angle").is_some());
+    assert!(v.get("illumination_pct").is_some());
+}
+
+#[test]
+fn moon_random_exits_zero() {
+    fnord()
+        .args(["moon", "--body", "random"])
+        .assert()
+        .success();
+}
+
+#[test]
+fn moon_season_exits_zero() {
+    fnord()
+        .args(["moon", "--season"])
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+}
+
+// ─── zodiac ────────────────────────────────────────────────────────────────
+
+#[test]
+fn zodiac_exits_zero() {
+    fnord()
+        .arg("zodiac")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("ZODIAC"));
+}
+
+#[test]
+fn zodiac_discordian_exits_zero() {
+    fnord()
+        .args(["zodiac", "--system", "discordian"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("DISCORDIAN"));
+}
+
+#[test]
+fn zodiac_all_systems_exit_zero() {
+    for system in &["western", "vedic", "chinese", "discordian"] {
+        fnord()
+            .args(["zodiac", "--system", system])
+            .assert()
+            .success();
+    }
+}
+
+#[test]
+fn zodiac_json_is_valid_json() {
+    let output = fnord()
+        .args(["zodiac", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    assert!(v.get("system").is_some());
+    assert!(v.get("sign").is_some());
+    assert!(v.get("description").is_some());
+    assert!(v.get("date").is_some());
+}
+
+#[test]
+fn zodiac_jul4_is_cancer() {
+    fnord()
+        .args(["zodiac", "--system", "western", "--date", "1984-07-04"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Cancer"));
+}
+
+// ─── omens ─────────────────────────────────────────────────────────────────
+
+#[test]
+fn omens_generative_exits_zero() {
+    fnord()
+        .args(["omens", "--generative"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("OMENS"));
+}
+
+#[test]
+fn omens_generative_is_deterministic() {
+    let out1 = fnord()
+        .args(["omens", "--generative", "--date", "2025-06-15"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let out2 = fnord()
+        .args(["omens", "--generative", "--date", "2025-06-15"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    assert_eq!(out1, out2, "generative omens should be deterministic");
+}
+
+#[test]
+fn omens_generative_discordian_units() {
+    fnord()
+        .args(["omens", "--generative", "--units", "discordian"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Fn"))
+        .stdout(predicate::str::contains("Cabbage Units"));
+}
+
+#[test]
+fn omens_generative_raw_exits_zero() {
+    fnord()
+        .args(["omens", "--generative", "--raw"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("raw"));
+}
+
+#[test]
+fn omens_json_is_valid_json() {
+    let output = fnord()
+        .args(["omens", "--generative", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let s = String::from_utf8(output).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&s).expect("invalid JSON");
+    assert!(v.get("raw").is_some());
+    assert!(v.get("discordian").is_some());
+    assert!(v.get("interpretation").is_some());
+    assert!(v.get("directive").is_some());
 }
