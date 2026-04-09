@@ -65,25 +65,25 @@ pub enum Command {
     Oracle(OracleArgs),
 
     /// Apply fnord redaction to text
-    Fnord(StubArgs),
+    Fnord(FnordRedactArgs),
 
-    /// Determine if a hotdog is a sandwich
-    Hotdog(StubArgs),
+    /// Determine whether a file is a hotdog
+    Hotdog(HotdogArgs),
 
-    /// Dispense a head of cabbage
-    Cabbage(StubArgs),
+    /// Count content in Discordian units
+    Cabbage(CabbageArgs),
 
-    /// Invoke chaos
-    Chaos(StubArgs),
+    /// Shuffle lines, words, or characters
+    Chaos(ChaosArgs),
 
-    /// Consult the law (Principia Discordia)
-    Law(StubArgs),
+    /// Search text and apply the Law of Fives
+    Law(LawArgs),
 
-    /// Display the Five Commandments of Discordia
-    Pentabarf(StubArgs),
+    /// Validate text against the Five Commandments
+    Pentabarf(PentabarfArgs),
 
-    /// Erisian utilities and miscellany
-    Erisian(StubArgs),
+    /// Diff two files as a theological dispute
+    Erisian(ErisianArgs),
 
     /// Dispense a Zen koan (Discordian edition)
     Koan(KoanArgs),
@@ -148,6 +148,139 @@ pub struct HolydayArgs {
 /// Stub args for unimplemented subcommands
 #[derive(Args, Debug, Default)]
 pub struct StubArgs {}
+
+#[derive(Args, Debug, Default)]
+pub struct FnordRedactArgs {
+    /// Input file (reads from stdin if omitted)
+    #[arg(value_name = "FILE")]
+    pub file: Option<PathBuf>,
+
+    /// Replacement rate, 0.0 to 1.0 (overrides config)
+    #[arg(long, short = 'r', value_name = "RATE")]
+    pub rate: Option<f64>,
+
+    /// Seed string for reproducible chaos
+    #[arg(long, short = 's', value_name = "SEED")]
+    pub seed: Option<String>,
+
+    /// Disable preserve_structure — every word eligible
+    #[arg(long = "pure-chaos")]
+    pub pure_chaos: bool,
+
+    /// Override the replacement string (default "FNORD")
+    #[arg(long, value_name = "WORD")]
+    pub replacement: Option<String>,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct CabbageArgs {
+    /// One or more input files (reads from stdin if none)
+    #[arg(value_name = "FILE")]
+    pub files: Vec<PathBuf>,
+
+    /// Show only cabbage count
+    #[arg(long, short = 'c')]
+    pub cabbages: bool,
+
+    /// Show only Discord Unit count
+    #[arg(long = "discord-units", short = 'd')]
+    pub discord_units: bool,
+
+    /// Show only Erg of Confusion count
+    #[arg(long, short = 'e')]
+    pub ergs: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct ChaosArgs {
+    /// Input file (reads from stdin if omitted)
+    #[arg(value_name = "FILE")]
+    pub file: Option<PathBuf>,
+
+    /// Shuffle words within each line (instead of lines)
+    #[arg(long, short = 'w', conflicts_with = "chars")]
+    pub words: bool,
+
+    /// Shuffle all characters globally (preserving newlines)
+    #[arg(long, short = 'c')]
+    pub chars: bool,
+
+    /// Seed string for reproducible chaos
+    #[arg(long, short = 's', value_name = "SEED")]
+    pub seed: Option<String>,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct LawArgs {
+    /// Pattern to search for
+    #[arg(value_name = "PATTERN")]
+    pub pattern: String,
+
+    /// Files to search (reads stdin if none)
+    #[arg(value_name = "FILE")]
+    pub files: Vec<PathBuf>,
+
+    /// Case-insensitive matching
+    #[arg(long = "ignore-case", short = 'i')]
+    pub ignore_case: bool,
+
+    /// Match whole words only
+    #[arg(long, short = 'w')]
+    pub word: bool,
+
+    /// Invert match (lines that do NOT match)
+    #[arg(long, short = 'v')]
+    pub invert: bool,
+
+    /// Suppress the Law of Fives analysis
+    #[arg(long = "no-law")]
+    pub no_law: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct PentabarfArgs {
+    /// Input file (reads from stdin if omitted)
+    #[arg(value_name = "FILE")]
+    pub file: Option<PathBuf>,
+
+    /// Exit with code = 10 - score (for CI pipelines)
+    #[arg(long)]
+    pub strict: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct HotdogArgs {
+    /// One or more files to classify
+    #[arg(value_name = "FILE")]
+    pub files: Vec<PathBuf>,
+
+    /// Brief output (one line per file)
+    #[arg(long, short = 'b')]
+    pub brief: bool,
+
+    /// Suppress justification text
+    #[arg(long = "no-justify")]
+    pub no_justify: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct ErisianArgs {
+    /// File A (ORDER)
+    #[arg(value_name = "FILE_A")]
+    pub file_a: PathBuf,
+
+    /// File B (CHAOS)
+    #[arg(value_name = "FILE_B")]
+    pub file_b: PathBuf,
+
+    /// Show only the theological summary
+    #[arg(long, short = 's')]
+    pub summary: bool,
+
+    /// Number of context lines around each dispute
+    #[arg(long, short = 'C', value_name = "N", default_value_t = 3)]
+    pub context: usize,
+}
 
 #[derive(Args, Debug, Default)]
 pub struct PopeArgs {
