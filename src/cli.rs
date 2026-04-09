@@ -50,16 +50,16 @@ pub enum Command {
     Fortune(FortuneArgs),
 
     /// Write in the Discordian grimoire (log)
-    Log(StubArgs),
+    Log(LogArgs),
 
-    /// Set an erisian alarm or reminder
-    Wake(StubArgs),
+    /// Morning dashboard with large ASCII-art Discordian date
+    Wake(WakeArgs),
 
     /// Display your Discordian papal credentials
     Pope(PopeArgs),
 
-    /// Consult the pineal gland oracle
-    Pineal(StubArgs),
+    /// Report system consciousness (pineal gland) status
+    Pineal(PinealArgs),
 
     /// Ask the oracle a question
     Oracle(OracleArgs),
@@ -254,6 +254,67 @@ pub struct OmensArgs {
     /// Date to read the omens for (today, yesterday, tomorrow, YYYY-MM-DD, +N, -N)
     #[arg(long, short = 'd', value_name = "DATE")]
     pub date: Option<String>,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct LogArgs {
+    /// Entry text. If omitted, launches $EDITOR with a temp file.
+    #[arg(value_name = "MESSAGE")]
+    pub message: Option<String>,
+
+    /// Override the grimoire path for this invocation only
+    #[arg(long, short = 'F', value_name = "FILE")]
+    pub file: Option<String>,
+
+    /// Append a fortune after the entry body
+    #[arg(long)]
+    pub fortune: bool,
+
+    /// Append today's omens after the entry body (generative)
+    #[arg(long)]
+    pub omens: bool,
+
+    /// Display the last N entries in reverse chronological order
+    #[arg(long, value_name = "N", num_args = 0..=1, default_missing_value = "10")]
+    pub list: Option<usize>,
+
+    /// Override the entry format (plaintext, markdown, org)
+    #[arg(long, value_name = "FORMAT")]
+    pub format: Option<String>,
+
+    /// Override the timestamp style (discordian, iso8601, both)
+    #[arg(long = "timestamp-style", value_name = "STYLE")]
+    pub timestamp_style: Option<String>,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct WakeArgs {
+    /// Suppress the moon panel
+    #[arg(long = "no-moon")]
+    pub no_moon: bool,
+
+    /// Show the omens panel
+    #[arg(long)]
+    pub omens: bool,
+
+    /// Show the fortune panel
+    #[arg(long)]
+    pub fortune: bool,
+
+    /// ASCII art font (standard, banner, doom, smush)
+    #[arg(long, value_name = "FONT")]
+    pub font: Option<String>,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct PinealArgs {
+    /// Verbosity level (minimal, normal, enlightened)
+    #[arg(long, short = 'v', value_name = "LEVEL")]
+    pub verbosity: Option<String>,
+
+    /// Append raw system values below the styled output
+    #[arg(long, short = 'r')]
+    pub raw: bool,
 }
 
 #[derive(Args, Debug, Default)]

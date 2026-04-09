@@ -5,6 +5,7 @@ mod error;
 mod holydays;
 mod moon;
 mod subcommands;
+mod wake;
 mod zodiac;
 
 use clap::Parser;
@@ -37,6 +38,9 @@ fn main() {
         Command::Moon(args) => subcommands::moon::run(&args, &config, json, no_color, no_unicode),
         Command::Zodiac(args) => subcommands::zodiac::run(&args, &config, json, no_color, no_unicode),
         Command::Omens(args) => subcommands::omens::run(&args, &config, json, no_color, no_unicode),
+        Command::Log(args) => subcommands::log::run(&args, &config, json, no_color),
+        Command::Wake(args) => subcommands::wake::run(&args, &config, json, no_color, no_unicode),
+        Command::Pineal(args) => subcommands::pineal::run(&args, &config, json, no_color, no_unicode),
         cmd => run_stub(cmd),
     };
 
@@ -101,9 +105,6 @@ fn run_holyday(args: &cli::HolydayArgs, _config: &config::Config, _json: bool) -
 
 fn run_stub(cmd: Command) -> Result<(), error::FnordError> {
     let name = match &cmd {
-        Command::Log(_) => "log",
-        Command::Wake(_) => "wake",
-        Command::Pineal(_) => "pineal",
         Command::Fnord(_) => "fnord",
         Command::Hotdog(_) => "hotdog",
         Command::Cabbage(_) => "cabbage",
