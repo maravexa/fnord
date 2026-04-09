@@ -21,6 +21,10 @@ pub struct Cli {
     #[arg(long = "no-color", global = true)]
     pub no_color: bool,
 
+    /// Disable unicode output (fall back to ASCII)
+    #[arg(long = "no-unicode", global = true)]
+    pub no_unicode: bool,
+
     #[command(subcommand)]
     pub command: Option<Command>,
 }
@@ -43,7 +47,7 @@ pub enum Command {
     Omens(StubArgs),
 
     /// Dispense a Discordian fortune
-    Fortune(StubArgs),
+    Fortune(FortuneArgs),
 
     /// Write in the Discordian grimoire (log)
     Log(StubArgs),
@@ -52,13 +56,13 @@ pub enum Command {
     Wake(StubArgs),
 
     /// Display your Discordian papal credentials
-    Pope(StubArgs),
+    Pope(PopeArgs),
 
     /// Consult the pineal gland oracle
     Pineal(StubArgs),
 
     /// Ask the oracle a question
-    Oracle(StubArgs),
+    Oracle(OracleArgs),
 
     /// Apply fnord redaction to text
     Fnord(StubArgs),
@@ -82,7 +86,7 @@ pub enum Command {
     Erisian(StubArgs),
 
     /// Dispense a Zen koan (Discordian edition)
-    Koan(StubArgs),
+    Koan(KoanArgs),
 
     /// Display your zodiac sign
     Zodiac(StubArgs),
@@ -144,3 +148,63 @@ pub struct HolydayArgs {
 /// Stub args for unimplemented subcommands
 #[derive(Args, Debug, Default)]
 pub struct StubArgs {}
+
+#[derive(Args, Debug, Default)]
+pub struct PopeArgs {
+    /// Print a single-line summary instead of the full declaration
+    #[arg(long, short = 's')]
+    pub short: bool,
+
+    /// Emit a full Papal Bull (multi-line ASCII document)
+    #[arg(long, short = 'b')]
+    pub bull: bool,
+
+    /// Regenerate the papal identity (non-deterministic for this run)
+    #[arg(long, short = 'r')]
+    pub reroll: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct OracleArgs {
+    /// The question to ask the Oracle. If omitted, you will be prompted.
+    #[arg(value_name = "QUESTION")]
+    pub question: Option<String>,
+
+    /// Reveal the raw seed value used to compute the answer
+    #[arg(long = "reveal-seed")]
+    pub reveal_seed: bool,
+
+    /// Mix in the current timestamp to produce a non-deterministic answer
+    #[arg(long)]
+    pub chaos: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct FortuneArgs {
+    /// Number of fortunes to print, separated by %
+    #[arg(long, short = 'c', default_value_t = 1)]
+    pub count: usize,
+
+    /// Filter to fortunes with a matching tag (e.g. "chaos" or "season:chaos")
+    #[arg(long, short = 't', value_name = "TAG")]
+    pub tag: Option<String>,
+
+    /// Ignore all weighting and pick fortunes uniformly at random
+    #[arg(long, short = 'r')]
+    pub random: bool,
+
+    /// Include fortunes from the offensive corpus if configured
+    #[arg(long)]
+    pub offensive: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct KoanArgs {
+    /// Number of koans to generate, separated by a blank line
+    #[arg(long, short = 'c', default_value_t = 1)]
+    pub count: usize,
+
+    /// Reproducible seed (any string); same seed always yields the same koan
+    #[arg(long, short = 's', value_name = "SEED")]
+    pub seed: Option<String>,
+}

@@ -21,12 +21,17 @@ fn main() {
     };
 
     let no_color = cli.no_color;
+    let no_unicode = cli.no_unicode;
     let json = cli.json;
 
     let result = match cli.command.unwrap_or(Command::Date(cli::DateArgs::default())) {
         Command::Date(args) => subcommands::date::run(&args, &config, json, no_color),
         Command::Cal(args) => subcommands::cal::run(&args, &config, no_color),
         Command::Holyday(args) => run_holyday(&args, &config, json),
+        Command::Pope(args) => subcommands::pope::run(&args, &config, json, no_color, no_unicode),
+        Command::Oracle(args) => subcommands::oracle::run(&args, &config, json, no_color, no_unicode),
+        Command::Fortune(args) => subcommands::fortune::run(&args, &config, json, no_color, no_unicode),
+        Command::Koan(args) => subcommands::koan::run(&args, &config, json, no_color, no_unicode),
         cmd => run_stub(cmd),
     };
 
@@ -93,12 +98,9 @@ fn run_stub(cmd: Command) -> Result<(), error::FnordError> {
     let name = match &cmd {
         Command::Moon(_) => "moon",
         Command::Omens(_) => "omens",
-        Command::Fortune(_) => "fortune",
         Command::Log(_) => "log",
         Command::Wake(_) => "wake",
-        Command::Pope(_) => "pope",
         Command::Pineal(_) => "pineal",
-        Command::Oracle(_) => "oracle",
         Command::Fnord(_) => "fnord",
         Command::Hotdog(_) => "hotdog",
         Command::Cabbage(_) => "cabbage",
@@ -106,7 +108,6 @@ fn run_stub(cmd: Command) -> Result<(), error::FnordError> {
         Command::Law(_) => "law",
         Command::Pentabarf(_) => "pentabarf",
         Command::Erisian(_) => "erisian",
-        Command::Koan(_) => "koan",
         Command::Zodiac(_) => "zodiac",
         _ => "unknown",
     };
