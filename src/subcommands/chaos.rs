@@ -110,7 +110,9 @@ pub fn shuffle_slice<T>(items: &mut [T], seed: &str) {
         return;
     }
     for i in (1..items.len()).rev() {
-        state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        state = state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         let j = (state >> 32) as usize % (i + 1);
         items.swap(i, j);
     }

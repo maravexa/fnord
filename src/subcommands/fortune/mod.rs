@@ -171,7 +171,10 @@ fn normalize_holyday(name: &str) -> String {
 }
 
 /// Build the fortune pool from builtin corpus + configured files.
-pub fn collect_fortunes(config: &Config, include_offensive: bool) -> Result<Vec<Fortune>, FnordError> {
+pub fn collect_fortunes(
+    config: &Config,
+    include_offensive: bool,
+) -> Result<Vec<Fortune>, FnordError> {
     let mut out: Vec<Fortune> = Vec::new();
     if config.fortune.builtin {
         for &t in BUILTIN_FORTUNES {
@@ -355,7 +358,11 @@ mod tests {
     fn builtin_corpus_loads() {
         let cfg = Config::default();
         let pool = collect_fortunes(&cfg, false).unwrap();
-        assert!(pool.len() >= 30, "expected at least 30 fortunes, got {}", pool.len());
+        assert!(
+            pool.len() >= 30,
+            "expected at least 30 fortunes, got {}",
+            pool.len()
+        );
         assert!(pool.iter().any(|f| f.text == "Fnord."));
         assert!(pool
             .iter()
@@ -435,14 +442,7 @@ An untagged fortune.
         let iterations = 1000;
         for i in 0..iterations {
             let seed = hash_str(&format!("seed:{i}"));
-            let picked = pick_weighted(
-                &refs,
-                seed,
-                true,
-                false,
-                Some(Season::Chaos),
-                None,
-            );
+            let picked = pick_weighted(&refs, seed, true, false, Some(Season::Chaos), None);
             if picked.text == "tagged chaos" {
                 tagged_hits += 1;
             }

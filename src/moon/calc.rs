@@ -323,8 +323,8 @@ mod tests {
         let d = NaiveDate::from_ymd_opt(2000, 2, 15).unwrap();
         let ref_date = Body::Triton.reference_new_moon();
         let days = (d - ref_date).num_days() as f64;
-        let forward = (days.rem_euclid(Body::Triton.orbital_period()))
-            / Body::Triton.orbital_period();
+        let forward =
+            (days.rem_euclid(Body::Triton.orbital_period())) / Body::Triton.orbital_period();
         let triton_angle = phase_angle(Body::Triton, d);
         let sum = wrap_unit(forward + triton_angle);
         // Forward + retrograde should sum to 0 or 1 (wrap-equivalent).

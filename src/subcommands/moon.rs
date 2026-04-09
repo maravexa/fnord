@@ -45,7 +45,15 @@ pub fn run(
         return print_json(body, target_date, angle, phase, illum_pct);
     }
 
-    render_default(body, target_date, angle, phase, illum_pct, no_color, no_unicode);
+    render_default(
+        body,
+        target_date,
+        angle,
+        phase,
+        illum_pct,
+        no_color,
+        no_unicode,
+    );
 
     if args.next {
         render_next(body, target_date, angle, no_color);
@@ -76,7 +84,12 @@ fn render_default(
 
     match body.parent_note() {
         Some(note) => {
-            println!("  {} ({}) — {}% illuminated", body.display_name(), note, illum_pct);
+            println!(
+                "  {} ({}) — {}% illuminated",
+                body.display_name(),
+                note,
+                illum_pct
+            );
             let period = body.orbital_period();
             if period < 1.0 {
                 let hours = period * 24.0;
@@ -164,7 +177,11 @@ fn render_season(
 
 /// Find the Gregorian date that corresponds to day `target_day` of
 /// `target_season` in the same Discordian year as `reference`.
-fn gregorian_for_season_day(reference: NaiveDate, target_season: Season, target_day: u8) -> NaiveDate {
+fn gregorian_for_season_day(
+    reference: NaiveDate,
+    target_season: Season,
+    target_day: u8,
+) -> NaiveDate {
     // Walk the calendar within ±400 days of `reference` — enough to cover a
     // full year in either direction. This is a simple, correct approach that
     // handles leap years and season boundaries without re-deriving the map.
@@ -182,8 +199,14 @@ fn gregorian_for_season_day(reference: NaiveDate, target_season: Season, target_
 fn short_discordian(d: &DiscordianDate) -> String {
     match d {
         DiscordianDate::SeasonDay {
-            season, day, weekday, ..
-        } => format!("Season of {season}, {weekday} the {day}{}", ordinal_suf(*day)),
+            season,
+            day,
+            weekday,
+            ..
+        } => format!(
+            "Season of {season}, {weekday} the {day}{}",
+            ordinal_suf(*day)
+        ),
         DiscordianDate::StTibsDay { .. } => "St. Tib's Day".to_string(),
     }
 }
@@ -191,7 +214,10 @@ fn short_discordian(d: &DiscordianDate) -> String {
 fn short_discordian_terse(d: &DiscordianDate) -> String {
     match d {
         DiscordianDate::SeasonDay {
-            season, day, weekday, ..
+            season,
+            day,
+            weekday,
+            ..
         } => format!("{season} {day}, {weekday}"),
         DiscordianDate::StTibsDay { .. } => "St. Tib's Day".to_string(),
     }

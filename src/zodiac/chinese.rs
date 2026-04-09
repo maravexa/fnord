@@ -8,16 +8,52 @@ use crate::zodiac::{Sign, ZodiacSystem};
 pub struct Chinese;
 
 const ANIMALS: [(&str, &str, &str); 12] = [
-    ("Rat", "🐀", "Resourceful, quick-witted, and always one step ahead of the trap."),
+    (
+        "Rat",
+        "🐀",
+        "Resourceful, quick-witted, and always one step ahead of the trap.",
+    ),
     ("Ox", "🐂", "Steady, patient, and suspicious of shortcuts."),
-    ("Tiger", "🐅", "Brave, impulsive, and prone to dramatic entrances."),
-    ("Rabbit", "🐇", "Gentle, diplomatic, and slightly elsewhere."),
-    ("Dragon", "🐉", "Charismatic, confident, and accidentally in charge."),
-    ("Snake", "🐍", "Wise, inscrutable, and owes you no explanations."),
-    ("Horse", "🐎", "Free-spirited, restless, and bad at standing still."),
-    ("Goat", "🐐", "Creative, tender-hearted, and quietly stubborn."),
-    ("Monkey", "🐒", "Clever, mischievous, and a terrible influence."),
-    ("Rooster", "🐓", "Observant, punctual, and loud on principle."),
+    (
+        "Tiger",
+        "🐅",
+        "Brave, impulsive, and prone to dramatic entrances.",
+    ),
+    (
+        "Rabbit",
+        "🐇",
+        "Gentle, diplomatic, and slightly elsewhere.",
+    ),
+    (
+        "Dragon",
+        "🐉",
+        "Charismatic, confident, and accidentally in charge.",
+    ),
+    (
+        "Snake",
+        "🐍",
+        "Wise, inscrutable, and owes you no explanations.",
+    ),
+    (
+        "Horse",
+        "🐎",
+        "Free-spirited, restless, and bad at standing still.",
+    ),
+    (
+        "Goat",
+        "🐐",
+        "Creative, tender-hearted, and quietly stubborn.",
+    ),
+    (
+        "Monkey",
+        "🐒",
+        "Clever, mischievous, and a terrible influence.",
+    ),
+    (
+        "Rooster",
+        "🐓",
+        "Observant, punctual, and loud on principle.",
+    ),
     ("Dog", "🐕", "Loyal, honest, and deeply worried about you."),
     ("Pig", "🐖", "Generous, earnest, and in favor of snacks."),
 ];

@@ -3,7 +3,6 @@
 
 use std::collections::HashSet;
 use std::io::{self, Read};
-use std::path::PathBuf;
 
 use serde_json::json;
 
@@ -81,7 +80,7 @@ pub fn run(args: &CabbageArgs, _config: &Config, json_out: bool) -> Result<(), F
     Ok(())
 }
 
-fn display_name(p: &PathBuf) -> String {
+fn display_name(p: &std::path::Path) -> String {
     p.display().to_string()
 }
 
@@ -89,7 +88,10 @@ pub fn compute_metrics(content: &str) -> CabbageMetrics {
     let cabbages = count_lines(content);
     let words: Vec<String> = content
         .split_whitespace()
-        .map(|s| s.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase())
+        .map(|s| {
+            s.trim_matches(|c: char| !c.is_alphanumeric())
+                .to_lowercase()
+        })
         .filter(|s| !s.is_empty())
         .collect();
     let discord_units = words.len();
@@ -205,7 +207,7 @@ fn format_int(n: usize) -> String {
     let mut out = String::with_capacity(s.len() + s.len() / 3);
     let len = bytes.len();
     for (i, c) in bytes.iter().enumerate() {
-        if i > 0 && (len - i) % 3 == 0 {
+        if i > 0 && (len - i).is_multiple_of(3) {
             out.push(',');
         }
         out.push(*c as char);
@@ -304,10 +306,22 @@ mod tests {
 
     #[test]
     fn test_assessment_thresholds() {
-        assert_eq!(assessment(0.0), "Suspiciously orderly. Greyface wrote this.");
+        assert_eq!(
+            assessment(0.0),
+            "Suspiciously orderly. Greyface wrote this."
+        );
         assert_eq!(assessment(0.40), "Some entropy detected. Keep going.");
-        assert_eq!(assessment(0.60), "Adequately chaotic. The Sacred Chao nods.");
-        assert_eq!(assessment(0.75), "A moderately chaotic document. Eris approves.");
-        assert_eq!(assessment(0.95), "Pure chaos. The Law of Fives is strong here.");
+        assert_eq!(
+            assessment(0.60),
+            "Adequately chaotic. The Sacred Chao nods."
+        );
+        assert_eq!(
+            assessment(0.75),
+            "A moderately chaotic document. Eris approves."
+        );
+        assert_eq!(
+            assessment(0.95),
+            "Pure chaos. The Law of Fives is strong here."
+        );
     }
 }

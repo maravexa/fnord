@@ -46,7 +46,15 @@ pub fn run(
         return Ok(());
     }
 
-    render(&question, &answer, seed, chaotic, args.reveal_seed, no_color, no_unicode);
+    render(
+        &question,
+        &answer,
+        seed,
+        chaotic,
+        args.reveal_seed,
+        no_color,
+        no_unicode,
+    );
     Ok(())
 }
 
@@ -71,10 +79,7 @@ fn prompt_for_question() -> Result<String, FnordError> {
 /// Build an answer by combining opening + middle + closing phrases.
 pub fn generate_answer(question: &str, seed: u64) -> String {
     let opening = pick(ORACLE_OPENINGS, seed);
-    let middle_raw = pick(
-        ORACLE_MIDDLES,
-        seed / (ORACLE_OPENINGS.len() as u64).max(1),
-    );
+    let middle_raw = pick(ORACLE_MIDDLES, seed / (ORACLE_OPENINGS.len() as u64).max(1));
     let closing = pick(
         ORACLE_CLOSINGS,
         seed / ((ORACLE_OPENINGS.len() * ORACLE_MIDDLES.len()) as u64).max(1),

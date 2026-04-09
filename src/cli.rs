@@ -113,6 +113,10 @@ pub struct DateArgs {
     /// Custom format string (%A weekday, %B season, %d day, %e ordinal day, %Y year, %H holyday, %a apostle, %n newline, %t tab)
     #[arg(long, short = 'f', value_name = "FORMAT")]
     pub format: Option<String>,
+
+    /// Print a reference table of all format tokens and exit
+    #[arg(long)]
+    pub help_format: bool,
 }
 
 #[derive(Args, Debug, Default)]
@@ -136,13 +140,72 @@ pub struct CalArgs {
 
 #[derive(Args, Debug, Default)]
 pub struct HolydayArgs {
-    /// Look up a specific holyday key (e.g. chaos-5, discord-50, st-tibs)
-    #[arg(value_name = "KEY")]
-    pub key: Option<String>,
+    #[command(subcommand)]
+    pub action: Option<HolydayAction>,
+}
 
+#[derive(Subcommand, Debug)]
+pub enum HolydayAction {
     /// List all known holydays
-    #[arg(long, short = 'l')]
-    pub list: bool,
+    List(HolydayListArgs),
+    /// Show holyday for a given date (or today)
+    Show(HolydayShowArgs),
+    /// Add a holyday to the personal holyday file
+    Add(HolydayAddArgs),
+    /// Remove a holyday from the personal holyday file
+    Remove(HolydayRemoveArgs),
+}
+
+#[derive(Args, Debug, Default)]
+pub struct HolydayListArgs {
+    /// Filter by season (chaos, discord, confusion, bureaucracy, aftermath)
+    #[arg(long, value_name = "SEASON")]
+    pub season: Option<String>,
+
+    /// Show source tags [default], [cabal], [personal]
+    #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
+    pub show_source: bool,
+
+    /// Output as JSON array
+    #[arg(long)]
+    pub json: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct HolydayShowArgs {
+    /// Date to check (today, yesterday, tomorrow, YYYY-MM-DD, +N, -N)
+    #[arg(value_name = "DATE")]
+    pub date: Option<String>,
+}
+
+#[derive(Args, Debug)]
+pub struct HolydayAddArgs {
+    /// Date key (e.g. chaos-15, st-tibs)
+    #[arg(value_name = "KEY")]
+    pub key: String,
+
+    /// Holyday name
+    #[arg(value_name = "NAME")]
+    pub name: String,
+
+    /// Description of the holyday
+    #[arg(long)]
+    pub description: Option<String>,
+
+    /// One-time holyday (requires --year)
+    #[arg(long)]
+    pub once: bool,
+
+    /// Year for a one-time holyday (YOLD)
+    #[arg(long, value_name = "YEAR")]
+    pub year: Option<i32>,
+}
+
+#[derive(Args, Debug)]
+pub struct HolydayRemoveArgs {
+    /// Date key to remove (e.g. chaos-15)
+    #[arg(value_name = "KEY")]
+    pub key: String,
 }
 
 /// Stub args for unimplemented subcommands

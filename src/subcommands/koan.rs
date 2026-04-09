@@ -176,7 +176,9 @@ mod tests {
     #[test]
     fn different_seeds_can_produce_different_koans() {
         // Across many seeds, at least two should differ somewhere.
-        let koans: Vec<Koan> = (0..10).map(|i| generate_koan(hash_str(&format!("{i}")), None)).collect();
+        let koans: Vec<Koan> = (0..10)
+            .map(|i| generate_koan(hash_str(&format!("{i}")), None))
+            .collect();
         let set: std::collections::HashSet<&String> = koans.iter().map(|k| &k.setup).collect();
         let set2: std::collections::HashSet<&String> = koans.iter().map(|k| &k.question).collect();
         let set3: std::collections::HashSet<&String> = koans.iter().map(|k| &k.response).collect();

@@ -49,9 +49,7 @@ impl Verbosity {
             "minimal" | "min" | "short" => Ok(Verbosity::Minimal),
             "normal" | "default" | "" => Ok(Verbosity::Normal),
             "enlightened" | "full" | "verbose" => Ok(Verbosity::Enlightened),
-            other => Err(FnordError::Parse(format!(
-                "unknown verbosity: '{other}'"
-            ))),
+            other => Err(FnordError::Parse(format!("unknown verbosity: '{other}'"))),
         }
     }
 }
@@ -284,9 +282,7 @@ fn print_enlightened_extras(m: &PinealMetrics, _no_color: bool, _no_unicode: boo
     let total_gb = bytes_to_gb(m.total_ram_bytes);
     let used_gb = bytes_to_gb(m.used_ram_bytes);
     let free_gb = (total_gb - used_gb).max(0.0);
-    println!(
-        "  RAM BREAKDOWN:  total={total_gb:.2}GB used={used_gb:.2}GB free={free_gb:.2}GB"
-    );
+    println!("  RAM BREAKDOWN:  total={total_gb:.2}GB used={used_gb:.2}GB free={free_gb:.2}GB");
     if !m.per_cpu_usage.is_empty() {
         let parts: Vec<String> = m
             .per_cpu_usage

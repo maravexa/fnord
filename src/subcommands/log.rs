@@ -63,7 +63,12 @@ impl TimestampStyle {
     }
 }
 
-pub fn run(args: &LogArgs, config: &Config, json_out: bool, _no_color: bool) -> Result<(), FnordError> {
+pub fn run(
+    args: &LogArgs,
+    config: &Config,
+    json_out: bool,
+    _no_color: bool,
+) -> Result<(), FnordError> {
     let format = match &args.format {
         Some(s) => LogFormat::parse(s)?,
         None => LogFormat::parse(&config.log.format)?,
@@ -74,10 +79,7 @@ pub fn run(args: &LogArgs, config: &Config, json_out: bool, _no_color: bool) -> 
         None => TimestampStyle::parse(&config.log.timestamp_style)?,
     };
 
-    let path_str = args
-        .file
-        .clone()
-        .unwrap_or_else(|| config.log.path.clone());
+    let path_str = args.file.clone().unwrap_or_else(|| config.log.path.clone());
     let path = expand_tilde(&path_str);
 
     if let Some(n) = args.list {
@@ -114,10 +116,7 @@ pub fn run(args: &LogArgs, config: &Config, json_out: bool, _no_color: bool) -> 
 
     let rendered = render_entry(format, style, &disc, &iso, &full_body);
 
-    let mut f = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&path)?;
+    let mut f = OpenOptions::new().create(true).append(true).open(&path)?;
     f.write_all(rendered.as_bytes())?;
 
     Ok(())
@@ -490,7 +489,10 @@ fn list_entries(
 fn split_header(header: &str) -> (String, Option<String>) {
     let lines: Vec<&str> = header.lines().collect();
     if lines.len() >= 2 {
-        (lines[0].trim().to_string(), Some(lines[1].trim().to_string()))
+        (
+            lines[0].trim().to_string(),
+            Some(lines[1].trim().to_string()),
+        )
     } else {
         (header.trim().to_string(), None)
     }

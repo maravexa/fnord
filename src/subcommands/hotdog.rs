@@ -158,13 +158,14 @@ pub fn classify(path: &PathBuf) -> Classification {
         .unwrap_or_else(|| path.display().to_string());
 
     // Extension check
-    let ext = path
-        .extension()
-        .map(|s| s.to_string_lossy().to_lowercase());
+    let ext = path.extension().map(|s| s.to_string_lossy().to_lowercase());
     match ext.as_deref() {
         Some("txt") | Some("md") | Some("log") => {}
         Some("rs") | Some("py") | Some("js") | Some("go") => {
-            not_hotdog_evidence.push(format!("extension .{} is too structured", ext.as_deref().unwrap_or("")));
+            not_hotdog_evidence.push(format!(
+                "extension .{} is too structured",
+                ext.as_deref().unwrap_or("")
+            ));
         }
         Some("toml") | Some("yaml") | Some("yml") | Some("json") => {
             not_hotdog_evidence.push("extension is bureaucratic".to_string());
@@ -265,12 +266,12 @@ fn is_prime(n: u64) -> bool {
     if n < 4 {
         return true;
     }
-    if n % 2 == 0 {
+    if n.is_multiple_of(2) {
         return false;
     }
     let mut i: u64 = 3;
     while i.saturating_mul(i) <= n {
-        if n % i == 0 {
+        if n.is_multiple_of(i) {
             return false;
         }
         i += 2;
@@ -296,10 +297,7 @@ mod tests {
 
     #[test]
     fn test_toml_not_hotdog() {
-        let mut f = tempfile::Builder::new()
-            .suffix(".toml")
-            .tempfile()
-            .unwrap();
+        let mut f = tempfile::Builder::new().suffix(".toml").tempfile().unwrap();
         writeln!(f, "[section]\nkey = \"value\"").unwrap();
         let c = classify(&f.path().to_path_buf());
         assert_eq!(c.verdict, Verdict::NotHotdog);

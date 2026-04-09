@@ -2,9 +2,36 @@
 name = "fnord"
 version = "0.1.0"
 edition = "2021"
-description = "A Discordian calendar and chaos utility"
+authors = ["Your Name <you@example.com>"]
+description = "A Discordian calendar and chaos utility. Weighs exactly 5 tons of flax."
 license = "WTFPL"
 repository = "https://github.com/maravexa/fnord"
+homepage = "https://github.com/maravexa/fnord"
+documentation = "https://github.com/maravexa/fnord#readme"
+readme = "README.md"
+keywords = ["discordian", "calendar", "ddate", "chaos", "cli"]
+categories = ["command-line-utilities", "date-and-time"]
+exclude = [
+    ".github/",
+    "tests/fixtures/",
+]
+
+[[bin]]
+name = "fnord"
+path = "src/main.rs"
+
+[[bin]]
+name = "generate-completions"
+path = "src/bin/generate-completions.rs"
+required-features = ["generate-assets"]
+
+[lib]
+name = "fnord_lib"
+path = "src/lib.rs"
+
+[features]
+default = []
+generate-assets = []
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
@@ -23,6 +50,10 @@ reqwest = { version = "0.12", features = ["blocking", "json"] }
 sysinfo = "0.30"
 atty = "0.2"
 similar = "2.4"
+
+[build-dependencies]
+clap_mangen = "0.2"
+clap_complete = "4"
 
 [dev-dependencies]
 assert_cmd = "2"

@@ -12,47 +12,89 @@
 pub const CONDITION_OMENS: &[(&str, &str)] = &[
     ("thunderstorm", "Eris is bowling. Stay indoors or don't."),
     ("thunder", "The sky is arguing with itself. It will lose."),
-    ("lightning", "The fnords have been electrified. Ground yourself."),
-    ("heavy rain", "Sacred precipitation cleanses the bureaucracy. Temporarily."),
-    ("torrential", "The Goddess is wringing out the week. Find a porch."),
-    ("rain", "Rain falls. Bureaucrats complain. Balance restored."),
+    (
+        "lightning",
+        "The fnords have been electrified. Ground yourself.",
+    ),
+    (
+        "heavy rain",
+        "Sacred precipitation cleanses the bureaucracy. Temporarily.",
+    ),
+    (
+        "torrential",
+        "The Goddess is wringing out the week. Find a porch.",
+    ),
+    (
+        "rain",
+        "Rain falls. Bureaucrats complain. Balance restored.",
+    ),
     ("drizzle", "A reluctant rain. The sky is hedging."),
     ("sleet", "The sky cannot commit. Dress for all outcomes."),
-    ("snow", "Order attempts to blanket chaos in white. It will melt."),
-    ("blizzard", "Entropy in powdered form. Do not drive toward it."),
+    (
+        "snow",
+        "Order attempts to blanket chaos in white. It will melt.",
+    ),
+    (
+        "blizzard",
+        "Entropy in powdered form. Do not drive toward it.",
+    ),
     ("hail", "The sky is throwing things. Take the hint."),
     ("fog", "The fnords are thick today. Visibility: spiritual."),
-    ("mist", "The world has been lightly redacted. Read between the drops."),
-    ("haze", "A gentle obscuring. You are not less seen; you are less seeable."),
-    ("smoke", "Something is burning. Probably paperwork. Open a window."),
+    (
+        "mist",
+        "The world has been lightly redacted. Read between the drops.",
+    ),
+    (
+        "haze",
+        "A gentle obscuring. You are not less seen; you are less seeable.",
+    ),
+    (
+        "smoke",
+        "Something is burning. Probably paperwork. Open a window.",
+    ),
     ("overcast", "The sky is indecisive. Join the club."),
     ("partly cloudy", "The universe is undecided. Join the club."),
     ("mostly cloudy", "Cloud is in charge today. Bow politely."),
     ("cloudy", "Cloud is watching. Be interesting."),
     ("clear", "The Goddess smiles. Be suspicious."),
-    ("sunny", "The sun performs its one trick with great sincerity. Applaud."),
+    (
+        "sunny",
+        "The sun performs its one trick with great sincerity. Applaud.",
+    ),
     ("fair", "Neither good nor bad. Probably a trap."),
-    ("suspicious clarity", "It is too clear. Something is about to happen. Something is always about to happen."),
-    ("unnatural stillness", "The fnords are holding their breath. Pretend not to notice."),
-    ("discordant winds", "The winds have made a committee and the committee is fighting."),
-    ("sacred precipitation", "It is raining on purpose. Catch some if you can."),
+    (
+        "suspicious clarity",
+        "It is too clear. Something is about to happen. Something is always about to happen.",
+    ),
+    (
+        "unnatural stillness",
+        "The fnords are holding their breath. Pretend not to notice.",
+    ),
+    (
+        "discordant winds",
+        "The winds have made a committee and the committee is fighting.",
+    ),
+    (
+        "sacred precipitation",
+        "It is raining on purpose. Catch some if you can.",
+    ),
 ];
 
 /// Generic fallbacks triggered when no keyword matches.
-pub const FALLBACK_OMEN: &str =
-    "The weather refuses to be interpreted. This, too, is information.";
+pub const FALLBACK_OMEN: &str = "The weather refuses to be interpreted. This, too, is information.";
 
 /// Temperature-band omens, used in addition to condition omens.
-pub const EXTREME_HEAT_OMEN: &str =
-    "The Sacred Chao is overheating. Offer it a cold beverage.";
+pub const EXTREME_HEAT_OMEN: &str = "The Sacred Chao is overheating. Offer it a cold beverage.";
 pub const FREEZING_OMEN: &str = "Greyface has won, temporarily. Wear a coat.";
-pub const STRONG_WIND_OMEN: &str =
-    "The winds carry messages. They are probably wrong.";
+pub const STRONG_WIND_OMEN: &str = "The winds carry messages. They are probably wrong.";
 
 /// 8-point wind directive table.
 pub const WIND_DIRECTIVES: &[(&str, &str)] = &[
     ("N", "Avoid paperwork today."),
-    ("NE", "A bureaucrat approaches from the northeast. Prepare fnords."),
+    (
+        "NE",
+        "A bureaucrat approaches from the northeast. Prepare fnords.",
+    ),
     ("E", "Something unexpected arrives. Welcome it."),
     ("SE", "Discord flows from the southeast. Embrace it."),
     ("S", "The Goddess points south. Follow or don't."),
@@ -165,7 +207,10 @@ mod tests {
 
     #[test]
     fn interpret_is_case_insensitive() {
-        assert_eq!(interpret_condition("Clear sky"), "The Goddess smiles. Be suspicious.");
+        assert_eq!(
+            interpret_condition("Clear sky"),
+            "The Goddess smiles. Be suspicious."
+        );
     }
 
     #[test]

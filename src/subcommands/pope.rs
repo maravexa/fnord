@@ -62,7 +62,10 @@ fn compute_seed(user: &str, host: &str, reroll: bool) -> u64 {
 /// Generate a papal title from a hash seed using three wordlists.
 pub fn generate_title(seed: u64) -> String {
     let hon = pick(POPE_HONORIFICS, seed);
-    let adj = pick(POPE_ADJECTIVES, seed / (POPE_HONORIFICS.len() as u64).max(1));
+    let adj = pick(
+        POPE_ADJECTIVES,
+        seed / (POPE_HONORIFICS.len() as u64).max(1),
+    );
     let noun = pick(
         POPE_NOUNS,
         seed / ((POPE_HONORIFICS.len() * POPE_ADJECTIVES.len()) as u64).max(1),
@@ -158,12 +161,9 @@ fn render_bull(
         return Ok(());
     }
 
-    let border_top =
-        "╔═══════════════════════════════════════════════════════════════════╗";
-    let border_bot =
-        "╚═══════════════════════════════════════════════════════════════════╝";
-    let border_mid =
-        "╠═══════════════════════════════════════════════════════════════════╣";
+    let border_top = "╔═══════════════════════════════════════════════════════════════════╗";
+    let border_bot = "╚═══════════════════════════════════════════════════════════════════╝";
+    let border_mid = "╠═══════════════════════════════════════════════════════════════════╣";
     let (t, b, m) = if no_unicode {
         (
             "+-------------------------------------------------------------------+",

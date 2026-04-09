@@ -280,14 +280,11 @@ pub fn count_contradictions(text: &str) -> usize {
         }
 
         // Check for negation within previous 3 tokens.
-        let mut negated = false;
-        for j in i.saturating_sub(3)..i {
-            let prev = tokens[j];
-            if prev == "not" || prev == "no" || prev.ends_with("n't") {
-                negated = true;
-                break;
-            }
-        }
+        let negated = tokens
+            .iter()
+            .take(i)
+            .skip(i.saturating_sub(3))
+            .any(|prev| *prev == "not" || *prev == "no" || prev.ends_with("n't"));
         if negated {
             negated_words.insert(w);
         } else {
@@ -345,7 +342,11 @@ pub fn check_iii(text: &str) -> CommandmentResult {
 /// IV — Each Soul is Inviolate. No second-person commands.
 pub fn check_iv(text: &str) -> CommandmentResult {
     let lower = text.to_lowercase();
-    let found: Vec<&str> = COMMANDS.iter().copied().filter(|p| lower.contains(*p)).collect();
+    let found: Vec<&str> = COMMANDS
+        .iter()
+        .copied()
+        .filter(|p| lower.contains(*p))
+        .collect();
     let (status, explanation) = if found.is_empty() {
         (
             Status::Compliant,
@@ -359,7 +360,10 @@ pub fn check_iv(text: &str) -> CommandmentResult {
             .join(", ");
         (
             Status::Violation,
-            format!("{} commands detected: {list}. Souls are being violated.", found.len()),
+            format!(
+                "{} commands detected: {list}. Souls are being violated.",
+                found.len()
+            ),
         )
     };
     CommandmentResult {
@@ -379,14 +383,22 @@ pub fn check_v(text: &str) -> CommandmentResult {
         .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
         .collect();
-    let hits: Vec<&str> = ORDER_WORDS.iter().copied().filter(|w| tokens.contains(*w)).collect();
+    let hits: Vec<&str> = ORDER_WORDS
+        .iter()
+        .copied()
+        .filter(|w| tokens.contains(*w))
+        .collect();
     let (status, explanation) = if hits.len() > 3 {
         (
             Status::Violation,
             format!(
                 "{} order-words detected: {}. The Sacred Chao weeps.",
                 hits.len(),
-                hits.iter().take(8).map(|s| format!("\"{s}\"")).collect::<Vec<_>>().join(", ")
+                hits.iter()
+                    .take(8)
+                    .map(|s| format!("\"{s}\""))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             ),
         )
     } else if !hits.is_empty() {
@@ -395,7 +407,10 @@ pub fn check_v(text: &str) -> CommandmentResult {
             format!(
                 "{} order-words detected: {}. The Sacred Chao is mildly sad.",
                 hits.len(),
-                hits.iter().map(|s| format!("\"{s}\"")).collect::<Vec<_>>().join(", ")
+                hits.iter()
+                    .map(|s| format!("\"{s}\""))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             ),
         )
     } else {
@@ -514,7 +529,10 @@ mod tests {
 
     #[test]
     fn test_perfect_score_verdict() {
-        assert_eq!(verdict_for(10), "Perfect Chaos — Eris smiles upon this text");
+        assert_eq!(
+            verdict_for(10),
+            "Perfect Chaos — Eris smiles upon this text"
+        );
     }
 
     #[test]

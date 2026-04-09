@@ -17,7 +17,9 @@ pub fn run(args: &CalArgs, _config: &Config, no_color: bool) -> Result<(), Fnord
     let today_disc = to_discordian(today_naive);
 
     let (today_year, today_season, today_day) = match &today_disc {
-        DiscordianDate::SeasonDay { year, season, day, .. } => (*year, Some(*season), Some(*day)),
+        DiscordianDate::SeasonDay {
+            year, season, day, ..
+        } => (*year, Some(*season), Some(*day)),
         DiscordianDate::StTibsDay { year } => (*year, None, None),
     };
 
@@ -28,7 +30,15 @@ pub fn run(args: &CalArgs, _config: &Config, no_color: bool) -> Result<(), Fnord
 
     if args.all {
         for season in Season::all() {
-            render_season(season, target_year, today_year, today_season, today_day, &registry, no_color);
+            render_season(
+                season,
+                target_year,
+                today_year,
+                today_season,
+                today_day,
+                &registry,
+                no_color,
+            );
             println!();
         }
     } else {
@@ -38,7 +48,15 @@ pub fn run(args: &CalArgs, _config: &Config, no_color: bool) -> Result<(), Fnord
             // Default to current season; if St. Tib's Day, use Chaos
             today_season.unwrap_or(Season::Chaos)
         };
-        render_season(target_season, target_year, today_year, today_season, today_day, &registry, no_color);
+        render_season(
+            target_season,
+            target_year,
+            today_year,
+            today_season,
+            today_day,
+            &registry,
+            no_color,
+        );
     }
 
     Ok(())
@@ -105,7 +123,10 @@ fn render_season(
                 };
                 let holydays = registry.lookup(&fake_date);
                 if !holydays.is_empty() {
-                    let existing = holyday_legend.iter().find(|(d, _, _)| *d == day).map(|(_, _, s)| *s);
+                    let existing = holyday_legend
+                        .iter()
+                        .find(|(d, _, _)| *d == day)
+                        .map(|(_, _, s)| *s);
                     if let Some(s) = existing {
                         Some(s)
                     } else {
