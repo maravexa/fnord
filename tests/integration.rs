@@ -120,14 +120,50 @@ fn test_cal_specific_season() {
 }
 
 #[test]
-fn test_stub_subcommands() {
-    for sub in &["fnord", "hotdog", "cabbage", "chaos"] {
-        fnord()
-            .arg(sub)
-            .assert()
-            .success()
-            .stdout(predicate::str::contains("coming soon"));
-    }
+fn test_fnord_redact_reads_stdin() {
+    fnord()
+        .arg("fnord")
+        .arg("--rate")
+        .arg("1.0")
+        .arg("--pure-chaos")
+        .arg("--seed")
+        .arg("test")
+        .write_stdin("hello world\n")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("fnord").or(predicate::str::contains("FNORD")));
+}
+
+#[test]
+fn test_cabbage_reads_stdin() {
+    fnord()
+        .arg("cabbage")
+        .arg("-c")
+        .write_stdin("one\ntwo\nthree\n")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("3"));
+}
+
+#[test]
+fn test_chaos_reads_stdin() {
+    fnord()
+        .arg("chaos")
+        .arg("--seed")
+        .arg("test")
+        .write_stdin("a\nb\nc\n")
+        .assert()
+        .success();
+}
+
+#[test]
+fn test_law_searches_stdin() {
+    fnord()
+        .args(["law", "fox"])
+        .write_stdin("the quick brown fox\nno match here\n")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("fox"));
 }
 
 #[test]

@@ -41,7 +41,17 @@ fn main() {
         Command::Log(args) => subcommands::log::run(&args, &config, json, no_color),
         Command::Wake(args) => subcommands::wake::run(&args, &config, json, no_color, no_unicode),
         Command::Pineal(args) => subcommands::pineal::run(&args, &config, json, no_color, no_unicode),
-        cmd => run_stub(cmd),
+        Command::Fnord(args) => subcommands::redact::run(&args, &config, json),
+        Command::Cabbage(args) => subcommands::cabbage::run(&args, &config, json),
+        Command::Chaos(args) => subcommands::chaos::run(&args, &config, json),
+        Command::Law(args) => subcommands::law::run(&args, &config, json),
+        Command::Pentabarf(args) => {
+            subcommands::pentabarf::run(&args, &config, json, no_color, no_unicode)
+        }
+        Command::Hotdog(args) => subcommands::hotdog::run(&args, &config, json),
+        Command::Erisian(args) => {
+            subcommands::erisian::run(&args, &config, json, no_color, no_unicode)
+        }
     };
 
     if let Err(e) = result {
@@ -103,17 +113,3 @@ fn run_holyday(args: &cli::HolydayArgs, _config: &config::Config, _json: bool) -
     Ok(())
 }
 
-fn run_stub(cmd: Command) -> Result<(), error::FnordError> {
-    let name = match &cmd {
-        Command::Fnord(_) => "fnord",
-        Command::Hotdog(_) => "hotdog",
-        Command::Cabbage(_) => "cabbage",
-        Command::Chaos(_) => "chaos",
-        Command::Law(_) => "law",
-        Command::Pentabarf(_) => "pentabarf",
-        Command::Erisian(_) => "erisian",
-        _ => "unknown",
-    };
-    println!("fnord {name}: coming soon — all hail discordia");
-    Ok(())
-}
