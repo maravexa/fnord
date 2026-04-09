@@ -41,10 +41,10 @@ pub enum Command {
     Holyday(HolydayArgs),
 
     /// Show the current moon phase
-    Moon(StubArgs),
+    Moon(MoonArgs),
 
     /// Read the omens (weather + chaos report)
-    Omens(StubArgs),
+    Omens(OmensArgs),
 
     /// Dispense a Discordian fortune
     Fortune(FortuneArgs),
@@ -89,7 +89,7 @@ pub enum Command {
     Koan(KoanArgs),
 
     /// Display your zodiac sign
-    Zodiac(StubArgs),
+    Zodiac(ZodiacArgs),
 }
 
 #[derive(Args, Debug, Default)]
@@ -196,6 +196,64 @@ pub struct FortuneArgs {
     /// Include fortunes from the offensive corpus if configured
     #[arg(long)]
     pub offensive: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct MoonArgs {
+    /// Override the celestial body from config (luna, phobos, deimos, io,
+    /// europa, ganymede, titan, triton, random)
+    #[arg(long, short = 'b', value_name = "BODY")]
+    pub body: Option<String>,
+
+    /// Date to display the phase for (today, yesterday, tomorrow, YYYY-MM-DD, +N, -N)
+    #[arg(long, short = 'd', value_name = "DATE")]
+    pub date: Option<String>,
+
+    /// Append next full moon and next new moon in Discordian form
+    #[arg(long, short = 'n')]
+    pub next: bool,
+
+    /// Render a table of phases for every 5th day of the current Discordian season
+    #[arg(long, short = 's')]
+    pub season: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct ZodiacArgs {
+    /// Zodiac system (western, vedic, chinese, discordian)
+    #[arg(long, short = 's', value_name = "SYSTEM")]
+    pub system: Option<String>,
+
+    /// Date to use for the lookup (today, yesterday, tomorrow, YYYY-MM-DD, +N, -N)
+    #[arg(long, short = 'd', value_name = "DATE")]
+    pub date: Option<String>,
+
+    /// Show the extended description of the sign
+    #[arg(long, short = 'f')]
+    pub full: bool,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct OmensArgs {
+    /// Location override (defaults to config.weather.location)
+    #[arg(long, short = 'l', value_name = "LOCATION")]
+    pub location: Option<String>,
+
+    /// Force generative mode even if location is configured and network works
+    #[arg(long, short = 'g')]
+    pub generative: bool,
+
+    /// Append the raw metric weather values below the omen output
+    #[arg(long, short = 'r')]
+    pub raw: bool,
+
+    /// Units override ("discordian" or "metric")
+    #[arg(long, short = 'u', value_name = "UNITS")]
+    pub units: Option<String>,
+
+    /// Date to read the omens for (today, yesterday, tomorrow, YYYY-MM-DD, +N, -N)
+    #[arg(long, short = 'd', value_name = "DATE")]
+    pub date: Option<String>,
 }
 
 #[derive(Args, Debug, Default)]

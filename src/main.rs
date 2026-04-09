@@ -3,7 +3,9 @@ mod config;
 mod date;
 mod error;
 mod holydays;
+mod moon;
 mod subcommands;
+mod zodiac;
 
 use clap::Parser;
 use cli::{Cli, Command};
@@ -32,6 +34,9 @@ fn main() {
         Command::Oracle(args) => subcommands::oracle::run(&args, &config, json, no_color, no_unicode),
         Command::Fortune(args) => subcommands::fortune::run(&args, &config, json, no_color, no_unicode),
         Command::Koan(args) => subcommands::koan::run(&args, &config, json, no_color, no_unicode),
+        Command::Moon(args) => subcommands::moon::run(&args, &config, json, no_color, no_unicode),
+        Command::Zodiac(args) => subcommands::zodiac::run(&args, &config, json, no_color, no_unicode),
+        Command::Omens(args) => subcommands::omens::run(&args, &config, json, no_color, no_unicode),
         cmd => run_stub(cmd),
     };
 
@@ -96,8 +101,6 @@ fn run_holyday(args: &cli::HolydayArgs, _config: &config::Config, _json: bool) -
 
 fn run_stub(cmd: Command) -> Result<(), error::FnordError> {
     let name = match &cmd {
-        Command::Moon(_) => "moon",
-        Command::Omens(_) => "omens",
         Command::Log(_) => "log",
         Command::Wake(_) => "wake",
         Command::Pineal(_) => "pineal",
@@ -108,7 +111,6 @@ fn run_stub(cmd: Command) -> Result<(), error::FnordError> {
         Command::Law(_) => "law",
         Command::Pentabarf(_) => "pentabarf",
         Command::Erisian(_) => "erisian",
-        Command::Zodiac(_) => "zodiac",
         _ => "unknown",
     };
     println!("fnord {name}: coming soon — all hail discordia");
