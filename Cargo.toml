@@ -1,5 +1,5 @@
 [package]
-name = "fnord"
+name = "fn0rd"
 version = "0.1.0"
 edition = "2021"
 authors = ["Your Name <you@example.com>"]
@@ -26,7 +26,7 @@ path = "src/bin/generate-completions.rs"
 required-features = ["generate-assets"]
 
 [lib]
-name = "fnord_lib"
+name = "fn0rd_lib"
 path = "src/lib.rs"
 
 [features]

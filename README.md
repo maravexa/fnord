@@ -3,7 +3,7 @@
 > A Discordian calendar and chaos utility.
 > Weighs exactly 5 tons of flax.
 
-[![Crates.io](https://img.shields.io/crates/v/fnord.svg)](https://crates.io/crates/fnord)
+[![Crates.io](https://img.shields.io/crates/v/fn0rd.svg)](https://crates.io/crates/fn0rd)
 [![License: WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg)](LICENSE)
 
 All Hail Eris. All Hail Discordia.
@@ -17,7 +17,7 @@ related to the number five.
 ## Installation
 
 ```bash
-cargo install fnord
+cargo install fn0rd
 ```
 
 Or from source:
