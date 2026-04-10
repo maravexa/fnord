@@ -415,7 +415,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "fnord"
+name = "fn0rd"
 version = "0.1.0"
 dependencies = [
  "anyhow",

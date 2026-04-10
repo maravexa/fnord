@@ -1,7 +1,7 @@
 // Run with: cargo run --bin generate-completions --features generate-assets
 use clap::CommandFactory;
 use clap_complete::{generate_to, Shell};
-use fnord_lib::cli::Cli;
+use fn0rd_lib::cli::Cli;
 use std::path::PathBuf;
 
 fn main() {
