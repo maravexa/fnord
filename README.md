@@ -1,7 +1,7 @@
 # fnord
 
 > A Discordian calendar and chaos utility.
-> Weighs exactly 5 tons of flax.
+> Contains 5 tons of flax.
 
 [![Crates.io](https://img.shields.io/crates/v/fn0rd.svg)](https://crates.io/crates/fn0rd)
 [![License: WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg)](LICENSE)
@@ -347,4 +347,4 @@ WTFPL — see [LICENSE](LICENSE).
 You just DO WHAT THE FUCK YOU WANT TO.
 ```
 
-*All Hail Eris. All Hail Discordia. fnord weighs exactly 5 tons of flax.*
+*All Hail Eris. All Hail Discordia. Contains 5 tons of flax.*
