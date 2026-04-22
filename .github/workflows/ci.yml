@@ -146,15 +146,15 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "package"
-      - name: Check package contents
+      - name: Check src/ files are tracked and not excluded
         run: |
-          list=$(cargo package --list --offline)
-          echo "$list"
-          if ! echo "$list" | grep -q '^src/'; then
-            echo "::error::cargo package --list contains no src/ files. Check [package.exclude] in Cargo.toml."
+          count=$(git ls-files src/ | wc -l)
+          echo "Tracked src/ files: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::No src/ files tracked by git. Check exclude patterns in Cargo.toml."
             exit 1
           fi
-      - name: Verify package metadata
+      - name: Validate package metadata
         run: cargo metadata --no-deps --format-version 1 > /dev/null
 
   # ── Assets ────────────────────────────────────────────────────────────────
