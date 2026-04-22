@@ -1,6 +1,6 @@
 [package]
 name = "fn0rd"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Your Name <you@example.com>"]
 description = "A Discordian calendar and chaos utility. Weighs exactly 5 tons of flax."

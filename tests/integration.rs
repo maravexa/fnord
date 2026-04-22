@@ -922,7 +922,7 @@ fn version_flag_exits_zero() {
         .arg("--version")
         .assert()
         .success()
-        .stdout(predicate::str::contains("0.1.0"));
+        .stdout(predicate::str::contains("0.1.1"));
 }
 
 #[test]

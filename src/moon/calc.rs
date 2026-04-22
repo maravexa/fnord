@@ -187,6 +187,25 @@ impl PhaseName {
             self.emoji()
         }
     }
+
+    /// Alias for `label()`.
+    pub fn as_str(&self) -> &'static str {
+        self.label()
+    }
+
+    /// Unicode symbol (scales with font, unlike emoji).
+    pub fn symbol(&self) -> &'static str {
+        match self {
+            PhaseName::NewMoon => "●",
+            PhaseName::WaxingCrescent => "◗",
+            PhaseName::FirstQuarter => "◐",
+            PhaseName::WaxingGibbous => "◒",
+            PhaseName::FullMoon => "○",
+            PhaseName::WaningGibbous => "◓",
+            PhaseName::LastQuarter => "◑",
+            PhaseName::WaningCrescent => "◖",
+        }
+    }
 }
 
 /// Map a phase angle in `0.0..1.0` to a named bucket. The ranges match the
