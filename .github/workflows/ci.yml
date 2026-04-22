@@ -178,7 +178,7 @@ jobs:
           test -f completions/fnord.bash
           test -f completions/_fnord
           test -f completions/fnord.fish
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: generated-assets
           path: |
