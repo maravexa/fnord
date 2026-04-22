@@ -98,7 +98,7 @@ fn render_moon(
         let yn = y / ry;
 
         if yn.abs() > 1.0 {
-            line.extend(std::iter::repeat(' ').take(width));
+            line.extend(std::iter::repeat_n(' ', width));
             lines.push(line);
             continue;
         }

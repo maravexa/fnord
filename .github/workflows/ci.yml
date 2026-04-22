@@ -157,7 +157,7 @@ jobs:
             exit 1
           fi
       - name: Verify package compiles from tarball
-        run: cargo package --allow-dirty
+        run: cargo package --offline --allow-dirty
 
   # ── Assets ────────────────────────────────────────────────────────────────
   assets:

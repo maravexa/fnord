@@ -6,10 +6,7 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
-# RUSTSEC-2021-0145: atty uses libc::isatty() in a way that is technically
-# unsound on Windows. No fixed release exists; migrate to std::io::IsTerminal
-# when time allows (stable since 1.70).
-ignore = ["RUSTSEC-2021-0145"]
+ignore = []
 
 [licenses]
 version = 2
