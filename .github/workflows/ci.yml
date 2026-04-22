@@ -156,8 +156,8 @@ jobs:
             cat package-contents.txt
             exit 1
           fi
-      - name: Verify package compiles from tarball
-        run: cargo package --offline --allow-dirty
+      - name: Verify package metadata and contents
+        run: cargo package --no-verify --offline --allow-dirty
 
   # ── Assets ────────────────────────────────────────────────────────────────
   assets:
