@@ -67,13 +67,13 @@ jobs:
 
   # ── MSRV ──────────────────────────────────────────────────────────────────
   msrv:
-    name: MSRV (1.78.0)
+    name: MSRV (1.86.0)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.78.0
+          toolchain: 1.86.0
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "msrv"
@@ -129,13 +129,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@v2
         with:
-          tool: cargo-audit,cargo-deny
+          tool: cargo-deny
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "security"
-      - name: Audit dependencies
-        run: cargo audit --deny warnings
-      - name: Check deny policy
+      - name: Check deny policy (advisories, licenses, bans, sources)
         run: cargo deny check
 
   # ── Package ───────────────────────────────────────────────────────────────
@@ -158,8 +156,8 @@ jobs:
             cat package-contents.txt
             exit 1
           fi
-      - name: Dry-run publish
-        run: cargo publish --dry-run --allow-dirty
+      - name: Verify package compiles from tarball
+        run: cargo package --allow-dirty
 
   # ── Assets ────────────────────────────────────────────────────────────────
   assets:

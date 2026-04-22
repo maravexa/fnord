@@ -2,7 +2,7 @@
 name = "fn0rd"
 version = "0.1.1"
 edition = "2021"
-rust-version = "1.78.0"
+rust-version = "1.86.0"
 authors = ["Your Name <you@example.com>"]
 description = "A Discordian calendar and chaos utility. Weighs exactly 5 tons of flax."
 license = "WTFPL"

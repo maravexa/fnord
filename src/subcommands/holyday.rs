@@ -424,7 +424,7 @@ fn parse_season(s: &str) -> Result<Season, FnordError> {
     }
 }
 
-/// Naive TOML block remover: strip the [[holyday]] block matching the given date key.
+/// Naive TOML block remover: strip the `[[holyday]]` block matching the given date key.
 fn remove_entry_from_toml(content: &str, key_str: &str) -> String {
     let needle = format!("date = \"{key_str}\"");
     let mut result = String::with_capacity(content.len());
