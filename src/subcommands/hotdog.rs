@@ -266,12 +266,12 @@ fn is_prime(n: u64) -> bool {
     if n < 4 {
         return true;
     }
-    if n.is_multiple_of(2) {
+    if n % 2 == 0 {
         return false;
     }
     let mut i: u64 = 3;
     while i.saturating_mul(i) <= n {
-        if n.is_multiple_of(i) {
+        if n % i == 0 {
             return false;
         }
         i += 2;
@@ -283,17 +283,6 @@ fn is_prime(n: u64) -> bool {
 mod tests {
     use super::*;
     use std::io::Write;
-    use tempfile::NamedTempFile;
-
-    fn classify_name(name: &str) -> Verdict {
-        let mut f = tempfile::Builder::new()
-            .prefix(name)
-            .suffix("")
-            .tempfile()
-            .unwrap();
-        writeln!(f, "hello").unwrap();
-        classify(&f.path().to_path_buf()).verdict
-    }
 
     #[test]
     fn test_toml_not_hotdog() {

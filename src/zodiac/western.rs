@@ -91,7 +91,7 @@ impl ZodiacSystem for Western {
     }
 }
 
-/// Convert a `(month, day)` pair to the index into [`SIGNS`].
+/// Convert a `(month, day)` pair to the index into `SIGNS`.
 pub fn sign_index_for_date(month: u32, day: u32) -> usize {
     match (month, day) {
         (3, 21..=31) | (4, 1..=19) => 0,   // Aries

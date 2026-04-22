@@ -1,3 +1,7 @@
+// The binary includes the same source modules as the library. Many items in
+// those modules are library API that the binary itself doesn't call directly.
+#![allow(dead_code)]
+
 mod cli;
 mod config;
 mod date;

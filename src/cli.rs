@@ -162,7 +162,7 @@ pub struct HolydayListArgs {
     #[arg(long, value_name = "SEASON")]
     pub season: Option<String>,
 
-    /// Show source tags [default], [cabal], [personal]
+    /// Show source tags \[default\], \[cabal\], \[personal\]
     #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
     pub show_source: bool,
 

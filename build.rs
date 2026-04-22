@@ -7,7 +7,6 @@ fn main() {
 
 #[cfg(feature = "generate-assets")]
 fn generate_assets() {
-    use clap::CommandFactory;
     use clap_mangen::Man;
     use std::path::PathBuf;
 
@@ -24,8 +23,9 @@ fn generate_assets() {
     // Subcommand man pages
     for sub in cmd.get_subcommands() {
         let name = format!("fnord-{}", sub.get_name());
-        let man = Man::new(sub.clone().name(&name));
-        write_man(&man, &man_dir, &format!("{name}.1"));
+        let filename = format!("{name}.1");
+        let man = Man::new(sub.clone().name(name));
+        write_man(&man, &man_dir, &filename);
     }
 
     println!("cargo:rerun-if-changed=src/cli.rs");

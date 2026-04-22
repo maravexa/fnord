@@ -39,7 +39,11 @@ pub fn ascii_moon_unicode(fraction: f64, width: usize, height: usize) -> String 
 /// Returns a string like `"🌒 Waxing Crescent (23%)"` or `"◐ First Quarter (50%)"`.
 pub fn moon_status_line(fraction: f64, use_emoji: bool) -> String {
     let name = phase_name(fraction, PhaseGranularity::Standard);
-    let icon: &str = if use_emoji { name.emoji() } else { name.symbol() };
+    let icon: &str = if use_emoji {
+        name.emoji()
+    } else {
+        name.symbol()
+    };
     let illum = illumination_percent(fraction);
     format!("{} {} ({:.0}%)", icon, name.as_str(), illum)
 }
@@ -94,7 +98,7 @@ fn render_moon(
         let yn = y / ry;
 
         if yn.abs() > 1.0 {
-            line.extend(std::iter::repeat(' ').take(width));
+            line.extend(std::iter::repeat_n(' ', width));
             lines.push(line);
             continue;
         }
@@ -121,7 +125,11 @@ fn render_moon(
             let near_term = (x - term_x).abs() < 1.2 && term_x.abs() < circle_x;
 
             let ch = if near_edge {
-                if lit { lit_edge } else { shadow_fill }
+                if lit {
+                    lit_edge
+                } else {
+                    shadow_fill
+                }
             } else if near_term {
                 term_char
             } else if lit {
@@ -156,7 +164,10 @@ mod tests {
         let art = ascii_moon(0.0, 21, 11);
         let lit = art.chars().filter(|&c| c == 'O' || c == '@').count();
         let shadow = art.chars().filter(|&c| c == '.').count();
-        assert!(shadow > lit, "new moon should be mostly shadow (lit={lit}, shadow={shadow})");
+        assert!(
+            shadow > lit,
+            "new moon should be mostly shadow (lit={lit}, shadow={shadow})"
+        );
     }
 
     #[test]
@@ -164,7 +175,10 @@ mod tests {
         let art = ascii_moon(0.5, 21, 11);
         let lit = art.chars().filter(|&c| c == 'O' || c == '@').count();
         let shadow = art.chars().filter(|&c| c == '.').count();
-        assert!(lit > shadow, "full moon should be mostly lit (lit={lit}, shadow={shadow})");
+        assert!(
+            lit > shadow,
+            "full moon should be mostly lit (lit={lit}, shadow={shadow})"
+        );
     }
 
     #[test]

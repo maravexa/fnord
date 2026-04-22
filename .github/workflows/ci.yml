@@ -1,0 +1,209 @@
+# NOTE: Actions are pinned to major version tags (e.g. @v4).
+# For harder supply-chain security, consider pinning to full SHA digests instead.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+  RUST_BACKTRACE: 1
+
+jobs:
+
+  # ── Lint ──────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "lint"
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  # ── Test matrix ───────────────────────────────────────────────────────────
+  test:
+    name: Test (${{ matrix.os }} / ${{ matrix.toolchain }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        toolchain: [stable, beta]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "test-${{ matrix.os }}-${{ matrix.toolchain }}"
+      - name: Build
+        run: cargo build --workspace --all-targets --verbose
+      - name: Run tests
+        run: cargo test --workspace --all-targets --verbose
+      - name: Run doctests
+        run: cargo test --workspace --doc
+
+  # ── MSRV ──────────────────────────────────────────────────────────────────
+  msrv:
+    name: MSRV (1.86.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.86.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "msrv"
+      - name: Build on MSRV
+        run: cargo build --workspace --all-features --locked
+
+  # ── Docs ──────────────────────────────────────────────────────────────────
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "docs"
+      - name: Check documentation
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: cargo doc --workspace --all-features --no-deps --document-private-items
+
+  # ── Coverage ──────────────────────────────────────────────────────────────
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "coverage"
+      - name: Generate coverage report
+        run: cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+      - uses: codecov/codecov-action@v4
+        if: ${{ env.CODECOV_TOKEN != '' }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: lcov.info
+          fail_ci_if_error: false
+
+  # ── Security ──────────────────────────────────────────────────────────────
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "security"
+      - name: Check deny policy (advisories, licenses, bans, sources)
+        run: cargo deny check
+
+  # ── Package ───────────────────────────────────────────────────────────────
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "package"
+      - name: Check src/ files are tracked and not excluded
+        run: |
+          count=$(git ls-files src/ | wc -l)
+          echo "Tracked src/ files: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::No src/ files tracked by git. Check exclude patterns in Cargo.toml."
+            exit 1
+          fi
+      - name: Validate package metadata
+        run: cargo metadata --no-deps --format-version 1 > /dev/null
+
+  # ── Assets ────────────────────────────────────────────────────────────────
+  assets:
+    name: Assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "assets"
+      - name: Build with generate-assets feature
+        run: cargo build --features generate-assets
+      - name: Generate shell completions
+        run: cargo run --bin generate-completions --features generate-assets
+      - name: Verify expected outputs
+        run: |
+          test -f man/fnord.1
+          test -f man/fnord-date.1
+          test -f completions/fnord.bash
+          test -f completions/_fnord
+          test -f completions/fnord.fish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-assets
+          path: |
+            man/
+            completions/
+          retention-days: 7
+
+  # ── CI Complete ───────────────────────────────────────────────────────────
+  ci-complete:
+    name: CI Complete
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - lint
+      - test
+      - msrv
+      - docs
+      - coverage
+      - security
+      - package
+      - assets
+    steps:
+      - name: Verify all jobs succeeded
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "::error::One or more required jobs failed or were cancelled."
+            exit 1
+          fi

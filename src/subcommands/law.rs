@@ -182,7 +182,7 @@ pub fn apply_law_of_fives(n: usize) -> String {
         "Zero matches. Zero is five minus five. The Law holds.".to_string()
     } else if n == 5 {
         "Five matches. The Law of Fives is self-evident.".to_string()
-    } else if n.is_multiple_of(5) {
+    } else if n % 5 == 0 {
         "Divisible by five. The Law of Fives is satisfied.".to_string()
     } else {
         let nearest_five = (((n as f64) / 5.0).round() * 5.0) as usize;
