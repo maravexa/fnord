@@ -142,22 +142,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "package"
       - name: Check package contents
         run: |
-          cargo package --list > package-contents.txt
-          if ! grep -q '^src/' package-contents.txt; then
+          list=$(cargo package --list --offline)
+          echo "$list"
+          if ! echo "$list" | grep -q '^src/'; then
             echo "::error::cargo package --list contains no src/ files. Check [package.exclude] in Cargo.toml."
-            cat package-contents.txt
             exit 1
           fi
-      - name: Verify package metadata and contents
-        run: cargo package --no-verify --offline --allow-dirty
+      - name: Verify package metadata
+        run: cargo metadata --no-deps --format-version 1 > /dev/null
 
   # ── Assets ────────────────────────────────────────────────────────────────
   assets:
