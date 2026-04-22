@@ -207,7 +207,7 @@ fn format_int(n: usize) -> String {
     let mut out = String::with_capacity(s.len() + s.len() / 3);
     let len = bytes.len();
     for (i, c) in bytes.iter().enumerate() {
-        if i > 0 && (len - i).is_multiple_of(3) {
+        if i > 0 && (len - i) % 3 == 0 {
             out.push(',');
         }
         out.push(*c as char);

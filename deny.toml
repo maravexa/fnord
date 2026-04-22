@@ -6,7 +6,10 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
-ignore = []
+# RUSTSEC-2021-0145: atty uses libc::isatty() in a way that is technically
+# unsound on Windows. No fixed release exists; migrate to std::io::IsTerminal
+# when time allows (stable since 1.70).
+ignore = ["RUSTSEC-2021-0145"]
 
 [licenses]
 version = 2
@@ -25,6 +28,11 @@ allow = [
     "MPL-2.0",
 ]
 confidence-threshold = 0.9
+
+# fn0rd itself is WTFPL; only its dependencies must use conventional OSI licenses.
+[[licenses.exceptions]]
+allow = ["WTFPL"]
+name = "fn0rd"
 
 [bans]
 multiple-versions = "warn"

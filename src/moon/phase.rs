@@ -21,7 +21,7 @@ pub fn phase_name(fraction: f64, granularity: PhaseGranularity) -> PhaseName {
     let f = fraction.rem_euclid(1.0);
     match granularity {
         PhaseGranularity::Simple => {
-            if f < 0.125 || f >= 0.875 {
+            if !(0.125..0.875).contains(&f) {
                 PhaseName::NewMoon
             } else if f < 0.375 {
                 PhaseName::FirstQuarter
@@ -32,7 +32,7 @@ pub fn phase_name(fraction: f64, granularity: PhaseGranularity) -> PhaseName {
             }
         }
         PhaseGranularity::Standard => {
-            if f < 0.0625 || f >= 0.9375 {
+            if !(0.0625..0.9375).contains(&f) {
                 PhaseName::NewMoon
             } else if f < 0.1875 {
                 PhaseName::WaxingCrescent
@@ -74,19 +74,14 @@ pub struct PhaseAge {
 ///
 /// Works for any body; does not account for retrograde motion (the fraction
 /// returned matches the forward orbital cycle, not the inverted display angle).
-pub fn phase_age_with_period(
-    date: NaiveDate,
-    synodic_period: f64,
-    epoch: NaiveDate,
-) -> PhaseAge {
+pub fn phase_age_with_period(date: NaiveDate, synodic_period: f64, epoch: NaiveDate) -> PhaseAge {
     let days_since = (date - epoch).num_days() as f64;
     let cycles = days_since / synodic_period;
     let fraction = cycles.rem_euclid(1.0);
     let days = fraction * synodic_period;
 
     let last_cycle = cycles.floor();
-    let last_new_moon =
-        epoch + Duration::days((last_cycle * synodic_period).round() as i64);
+    let last_new_moon = epoch + Duration::days((last_cycle * synodic_period).round() as i64);
     let next_new_moon =
         epoch + Duration::days(((last_cycle + 1.0) * synodic_period).round() as i64);
 
@@ -116,7 +111,11 @@ mod tests {
     fn phase_age_new_moon_epoch() {
         let date = NaiveDate::from_ymd_opt(2000, 1, 6).unwrap();
         let age = phase_age(date);
-        assert!(age.days < 0.5, "epoch should be near new moon, got {}", age.days);
+        assert!(
+            age.days < 0.5,
+            "epoch should be near new moon, got {}",
+            age.days
+        );
     }
 
     #[test]
@@ -151,29 +150,74 @@ mod tests {
 
     #[test]
     fn phase_name_standard_boundaries() {
-        assert_eq!(phase_name(0.0, PhaseGranularity::Standard), PhaseName::NewMoon);
-        assert_eq!(phase_name(0.125, PhaseGranularity::Standard), PhaseName::WaxingCrescent);
-        assert_eq!(phase_name(0.25, PhaseGranularity::Standard), PhaseName::FirstQuarter);
-        assert_eq!(phase_name(0.375, PhaseGranularity::Standard), PhaseName::WaxingGibbous);
-        assert_eq!(phase_name(0.5, PhaseGranularity::Standard), PhaseName::FullMoon);
-        assert_eq!(phase_name(0.625, PhaseGranularity::Standard), PhaseName::WaningGibbous);
-        assert_eq!(phase_name(0.75, PhaseGranularity::Standard), PhaseName::LastQuarter);
-        assert_eq!(phase_name(0.875, PhaseGranularity::Standard), PhaseName::WaningCrescent);
+        assert_eq!(
+            phase_name(0.0, PhaseGranularity::Standard),
+            PhaseName::NewMoon
+        );
+        assert_eq!(
+            phase_name(0.125, PhaseGranularity::Standard),
+            PhaseName::WaxingCrescent
+        );
+        assert_eq!(
+            phase_name(0.25, PhaseGranularity::Standard),
+            PhaseName::FirstQuarter
+        );
+        assert_eq!(
+            phase_name(0.375, PhaseGranularity::Standard),
+            PhaseName::WaxingGibbous
+        );
+        assert_eq!(
+            phase_name(0.5, PhaseGranularity::Standard),
+            PhaseName::FullMoon
+        );
+        assert_eq!(
+            phase_name(0.625, PhaseGranularity::Standard),
+            PhaseName::WaningGibbous
+        );
+        assert_eq!(
+            phase_name(0.75, PhaseGranularity::Standard),
+            PhaseName::LastQuarter
+        );
+        assert_eq!(
+            phase_name(0.875, PhaseGranularity::Standard),
+            PhaseName::WaningCrescent
+        );
     }
 
     #[test]
     fn phase_name_wraps() {
-        assert_eq!(phase_name(1.0, PhaseGranularity::Standard), PhaseName::NewMoon);
-        assert_eq!(phase_name(1.5, PhaseGranularity::Standard), PhaseName::FullMoon);
-        assert_eq!(phase_name(-0.25, PhaseGranularity::Standard), PhaseName::LastQuarter);
+        assert_eq!(
+            phase_name(1.0, PhaseGranularity::Standard),
+            PhaseName::NewMoon
+        );
+        assert_eq!(
+            phase_name(1.5, PhaseGranularity::Standard),
+            PhaseName::FullMoon
+        );
+        assert_eq!(
+            phase_name(-0.25, PhaseGranularity::Standard),
+            PhaseName::LastQuarter
+        );
     }
 
     #[test]
     fn phase_name_simple_boundaries() {
-        assert_eq!(phase_name(0.0, PhaseGranularity::Simple), PhaseName::NewMoon);
-        assert_eq!(phase_name(0.25, PhaseGranularity::Simple), PhaseName::FirstQuarter);
-        assert_eq!(phase_name(0.5, PhaseGranularity::Simple), PhaseName::FullMoon);
-        assert_eq!(phase_name(0.75, PhaseGranularity::Simple), PhaseName::LastQuarter);
+        assert_eq!(
+            phase_name(0.0, PhaseGranularity::Simple),
+            PhaseName::NewMoon
+        );
+        assert_eq!(
+            phase_name(0.25, PhaseGranularity::Simple),
+            PhaseName::FirstQuarter
+        );
+        assert_eq!(
+            phase_name(0.5, PhaseGranularity::Simple),
+            PhaseName::FullMoon
+        );
+        assert_eq!(
+            phase_name(0.75, PhaseGranularity::Simple),
+            PhaseName::LastQuarter
+        );
     }
 
     #[test]
