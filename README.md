@@ -4,7 +4,6 @@
 > Contains 5 tons of flax.
 
 [![CI](https://github.com/maravexa/fnord/actions/workflows/ci.yml/badge.svg)](https://github.com/maravexa/fnord/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/maravexa/fnord/branch/main/graph/badge.svg)](https://codecov.io/gh/maravexa/fnord)
 [![Crates.io](https://img.shields.io/crates/v/fn0rd.svg)](https://crates.io/crates/fn0rd)
 [![License: WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg)](LICENSE)
 
