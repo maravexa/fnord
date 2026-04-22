@@ -1,6 +1,91 @@
 //! ASCII and Unicode art moon renderer.
 
+use super::calc::PhaseName;
 use super::phase::{illumination_percent, phase_name, PhaseGranularity};
+
+// ---------------------------------------------------------------------------
+// Fixed 7-line ASCII art for each of the 8 named lunar phases.
+// Convention: space = lit area, `:` = shadow interior, outline chars unchanged.
+// Shadow is on the LEFT for waxing phases, RIGHT for waning phases.
+// ---------------------------------------------------------------------------
+
+const ART_NEW_MOON: &str = r#"    _..._
+  .':::::`..
+ /:::::::::\
+|:::::::::::|
+ \:::::::::/
+  `.:::::.'
+    `'''"#;
+
+const ART_WAXING_CRESCENT: &str = r#"    _..._
+  .':::: `.
+ /:::::::  \
+|:::::::::  |
+ \:::::::  /
+  `.:::: .'
+    `'''"#;
+
+const ART_FIRST_QUARTER: &str = r#"    _..._
+  .'::   `.
+ /::::     \
+|::::::     |
+ \::::     /
+  `.::   .'
+    `'''"#;
+
+const ART_WAXING_GIBBOUS: &str = r#"    _..._
+  .':    `.
+ /::       \
+|:::        |
+ \::       /
+  `.:    .'
+    `'''"#;
+
+const ART_FULL_MOON: &str = r#"    _..._
+  .'     `.
+ /         \
+|           |
+ \         /
+  `.     .'
+    `'''"#;
+
+const ART_WANING_GIBBOUS: &str = r#"    _..._
+  .'    :`.
+ /       ::\
+|        :::|
+ \       ::/
+  `.    :.'
+    `'''"#;
+
+const ART_LAST_QUARTER: &str = r#"    _..._
+  .'   ::`.
+ /    :::::\
+|     ::::::|
+ \    :::::/
+  `.   ::.'
+    `'''"#;
+
+const ART_WANING_CRESCENT: &str = r#"    _..._
+  .' ::::`.
+ /  :::::::\
+|  :::::::::|
+ \  :::::::/
+  `. ::::.'
+    `'''"#;
+
+/// Return a fixed 7-line ASCII art block for the given phase.
+pub fn ascii_art_for_phase(phase: PhaseName) -> &'static str {
+    match phase {
+        PhaseName::NewMoon => ART_NEW_MOON,
+        PhaseName::WaxingCrescent => ART_WAXING_CRESCENT,
+        PhaseName::FirstQuarter => ART_FIRST_QUARTER,
+        PhaseName::WaxingGibbous => ART_WAXING_GIBBOUS,
+        PhaseName::FullMoon => ART_FULL_MOON,
+        PhaseName::WaningGibbous => ART_WANING_GIBBOUS,
+        PhaseName::LastQuarter => ART_LAST_QUARTER,
+        PhaseName::WaningCrescent => ART_WANING_CRESCENT,
+    }
+}
 
 /// Render an ASCII art moon at the given character dimensions.
 ///
@@ -201,5 +286,48 @@ mod tests {
         let s = moon_status_line(0.5, true);
         assert!(s.contains("Full Moon"), "got: {s}");
         assert!(s.contains("100%") || s.contains("99%"), "got: {s}");
+    }
+
+    #[test]
+    fn ascii_art_for_phase_all_distinct() {
+        use super::super::calc::PhaseName;
+        let phases = [
+            PhaseName::NewMoon,
+            PhaseName::WaxingCrescent,
+            PhaseName::FirstQuarter,
+            PhaseName::WaxingGibbous,
+            PhaseName::FullMoon,
+            PhaseName::WaningGibbous,
+            PhaseName::LastQuarter,
+            PhaseName::WaningCrescent,
+        ];
+        let arts: Vec<&str> = phases.iter().map(|&p| ascii_art_for_phase(p)).collect();
+        for i in 0..arts.len() {
+            for j in (i + 1)..arts.len() {
+                assert_ne!(
+                    arts[i], arts[j],
+                    "phases {i} and {j} share the same ASCII art"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn ascii_art_for_phase_has_seven_lines() {
+        use super::super::calc::PhaseName;
+        for phase in [
+            PhaseName::NewMoon,
+            PhaseName::WaxingCrescent,
+            PhaseName::FirstQuarter,
+            PhaseName::WaxingGibbous,
+            PhaseName::FullMoon,
+            PhaseName::WaningGibbous,
+            PhaseName::LastQuarter,
+            PhaseName::WaningCrescent,
+        ] {
+            let art = ascii_art_for_phase(phase);
+            let lines = art.lines().count();
+            assert_eq!(lines, 7, "phase {phase:?} has {lines} lines, expected 7");
+        }
     }
 }
