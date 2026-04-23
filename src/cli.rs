@@ -412,6 +412,10 @@ pub struct MoonArgs {
     /// Render a table of phases for every 5th day of the current Discordian season
     #[arg(long, short = 's')]
     pub season: bool,
+
+    /// Render the moon phase as ASCII art instead of a Unicode emoji
+    #[arg(long)]
+    pub ascii: bool,
 }
 
 #[derive(Args, Debug, Default)]

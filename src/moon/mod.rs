@@ -6,7 +6,9 @@ pub mod upcoming;
 
 // Flat re-exports for convenient use by callers.
 #[allow(unused_imports)]
-pub use ascii::{ascii_moon, ascii_moon_default, ascii_moon_unicode, moon_status_line};
+pub use ascii::{
+    ascii_art_for_phase, ascii_moon, ascii_moon_default, ascii_moon_unicode, moon_status_line,
+};
 #[allow(unused_imports)]
 pub use calc::{
     days_to_full, days_to_new, illumination_fraction, phase_angle, phase_name_for_angle, Body,

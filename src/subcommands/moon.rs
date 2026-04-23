@@ -7,6 +7,7 @@ use crate::config::Config;
 use crate::date::convert::{parse_date_arg, to_discordian};
 use crate::date::types::{DiscordianDate, Season};
 use crate::error::FnordError;
+use crate::moon::ascii::ascii_art_for_phase;
 use crate::moon::calc::{
     days_to_full, days_to_new, illumination_fraction, phase_angle, phase_name_for_angle, Body,
     PhaseName,
@@ -45,15 +46,7 @@ pub fn run(
         return print_json(body, target_date, angle, phase, illum_pct);
     }
 
-    render_default(
-        body,
-        target_date,
-        angle,
-        phase,
-        illum_pct,
-        no_color,
-        no_unicode,
-    );
+    render_default(body, phase, illum_pct, no_color, no_unicode, args.ascii);
 
     if args.next {
         render_next(body, target_date, angle, no_color);
@@ -64,22 +57,33 @@ pub fn run(
 
 fn render_default(
     body: Body,
-    target_date: NaiveDate,
-    _angle: f64,
     phase: PhaseName,
     illum_pct: i64,
     no_color: bool,
     no_unicode: bool,
+    ascii: bool,
 ) {
-    let glyph = phase.glyph(no_unicode);
-    let label = phase.label();
-    let disc = to_discordian(target_date);
-
     println!();
-    if no_color {
-        println!("  {glyph}  {label}");
+
+    if ascii {
+        let art = ascii_art_for_phase(phase);
+        for line in art.lines() {
+            println!("  {line}");
+        }
+        println!();
+        if no_color {
+            println!("  {}", phase.label());
+        } else {
+            println!("  {}", phase.label().bold());
+        }
     } else {
-        println!("  {glyph}  {}", label.bold());
+        let glyph = phase.glyph(no_unicode);
+        let label = phase.label();
+        if no_color {
+            println!("  {glyph}  {label}");
+        } else {
+            println!("  {glyph}  {}", label.bold());
+        }
     }
 
     match body.parent_note() {
@@ -102,8 +106,6 @@ fn render_default(
             println!("  {} — {}% illuminated", body.display_name(), illum_pct);
         }
     }
-
-    println!("  {}", short_discordian(&disc));
 }
 
 fn render_next(body: Body, target_date: NaiveDate, angle: f64, _no_color: bool) {
@@ -196,21 +198,6 @@ fn gregorian_for_season_day(
     reference
 }
 
-fn short_discordian(d: &DiscordianDate) -> String {
-    match d {
-        DiscordianDate::SeasonDay {
-            season,
-            day,
-            weekday,
-            ..
-        } => format!(
-            "Season of {season}, {weekday} the {day}{}",
-            ordinal_suf(*day)
-        ),
-        DiscordianDate::StTibsDay { .. } => "St. Tib's Day".to_string(),
-    }
-}
-
 fn short_discordian_terse(d: &DiscordianDate) -> String {
     match d {
         DiscordianDate::SeasonDay {
@@ -221,10 +208,6 @@ fn short_discordian_terse(d: &DiscordianDate) -> String {
         } => format!("{season} {day}, {weekday}"),
         DiscordianDate::StTibsDay { .. } => "St. Tib's Day".to_string(),
     }
-}
-
-fn ordinal_suf(n: u8) -> &'static str {
-    crate::date::types::ordinal_suffix(n)
 }
 
 fn print_json(
