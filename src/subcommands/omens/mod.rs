@@ -454,8 +454,7 @@ mod tests {
         }
         assert!(
             descriptions.len() > 1,
-            "expected generative to vary across dates, got {:?}",
-            descriptions
+            "expected generative to vary across dates, got {descriptions:?}"
         );
     }
 

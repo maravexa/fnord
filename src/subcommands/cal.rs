@@ -84,7 +84,7 @@ fn render_season(
 ) {
     // Header
     let apostle = season.apostle();
-    println!("  {} {}  (Apostle: {})", season, target_year, apostle);
+    println!("  {season} {target_year}  (Apostle: {apostle})");
     println!();
 
     // Weekday headers
