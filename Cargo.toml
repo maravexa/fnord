@@ -37,7 +37,7 @@ generate-assets = ["dep:clap_complete"]
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
-toml = "0.8"
+toml = "1.1"
 anyhow = "1"
 chrono = { version = "0.4", features = ["serde"] }
 figment = { version = "0.10", features = ["toml", "env"] }
