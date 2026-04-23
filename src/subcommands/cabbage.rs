@@ -147,7 +147,7 @@ fn print_single(m: &CabbageMetrics) {
     println!("  {} Cabbages", format_int(m.cabbages));
     println!("  {} Discord Units", format_int(m.discord_units));
     println!("  {} Ergs of Confusion", format_int(m.ergs));
-    println!("  {:.1}% Fnord Density", density);
+    println!("  {density:.1}% Fnord Density");
     println!("  {} LoF Index", format_int(m.lof_index));
     println!();
     println!("  ASSESSMENT: {}", assessment(m.fnord_density()));

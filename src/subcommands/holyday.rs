@@ -292,7 +292,7 @@ fn run_add(args: &crate::cli::HolydayAddArgs) -> Result<(), FnordError> {
         args.name, key_str
     );
     if let Some(desc) = &args.description {
-        entry.push_str(&format!("description = {:?}\n", desc));
+        entry.push_str(&format!("description = {desc:?}\n"));
     }
     entry.push_str(&format!("recurring = {recurring}\n"));
     if let Some(year) = args.year {
@@ -338,7 +338,7 @@ fn run_remove(args: &crate::cli::HolydayRemoveArgs) -> Result<(), FnordError> {
     };
 
     // Prompt for confirmation
-    eprint!("  Remove holyday {key_str} {:?}? [y/N] ", holyday_name);
+    eprint!("  Remove holyday {key_str} {holyday_name:?}? [y/N] ");
     let mut input = String::new();
     std::io::stdin().read_line(&mut input).unwrap_or_default();
     if !input.trim().eq_ignore_ascii_case("y") {
@@ -350,7 +350,7 @@ fn run_remove(args: &crate::cli::HolydayRemoveArgs) -> Result<(), FnordError> {
     std::fs::write(&path, &new_content)?;
 
     println!();
-    println!("  ✦ Holyday removed: {key_str} {:?}", holyday_name);
+    println!("  ✦ Holyday removed: {key_str} {holyday_name:?}");
     println!("  The universe has been updated. Or has it?");
     println!();
     Ok(())
