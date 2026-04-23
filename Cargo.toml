@@ -62,3 +62,18 @@ assert_cmd = "2"
 predicates = "3"
 tempfile = "3"
 serde_json = "1"
+
+[package.metadata.deb]
+name = "fnord"
+section = "utils"
+priority = "optional"
+assets = [
+    { source = "target/release/fnord", dest = "/usr/bin/fnord", mode = "755" },
+    { source = "README.md", dest = "/usr/share/doc/fnord/README.md", mode = "644" },
+]
+
+[package.metadata.generate-rpm]
+assets = [
+    { source = "target/release/fnord", dest = "/usr/bin/fnord", mode = "755", config = false, doc = false },
+    { source = "README.md", dest = "/usr/share/doc/fnord/README.md", mode = "644", config = false, doc = true },
+]

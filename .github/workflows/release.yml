@@ -1,0 +1,126 @@
+# NOTE: Actions are pinned to major version tags (e.g. @v4).
+# For harder supply-chain security, consider pinning to full SHA digests instead.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+
+  # ── Build binaries and packages ───────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            arch: amd64
+            use_cross: false
+          - target: aarch64-unknown-linux-gnu
+            arch: arm64
+            use_cross: true
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "release-${{ matrix.target }}"
+
+      - name: Install cross (arm64 only)
+        if: matrix.use_cross == true
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+
+      - name: Install cargo-deb
+        run: cargo install cargo-deb --locked
+
+      - name: Install cargo-generate-rpm
+        run: cargo install cargo-generate-rpm --locked
+
+      - name: Build release binary
+        run: |
+          if [ "${{ matrix.use_cross }}" = "true" ]; then
+            cross build --release --locked --target ${{ matrix.target }}
+          else
+            cargo build --release --locked --target ${{ matrix.target }}
+          fi
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Create tarball
+        id: tarball
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TARBALL="fnord-v${VERSION}-linux-${{ matrix.arch }}.tar.gz"
+          tar czf "$TARBALL" \
+            -C "target/${{ matrix.target }}/release" fnord
+          echo "name=$TARBALL" >> "$GITHUB_OUTPUT"
+
+      - name: Build deb package
+        run: |
+          cargo deb \
+            --target ${{ matrix.target }} \
+            --no-build \
+            --no-strip \
+            --output dist-deb/
+
+      - name: Build rpm package
+        run: |
+          cargo generate-rpm \
+            --target ${{ matrix.target }} \
+            --output dist-rpm/
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: packages-${{ matrix.arch }}
+          path: |
+            ${{ steps.tarball.outputs.name }}
+            dist-deb/*.deb
+            dist-rpm/*.rpm
+          retention-days: 1
+
+  # ── Create GitHub Release ─────────────────────────────────────────────────
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: dist/
+          merge-multiple: true
+
+      - name: List release artifacts
+        run: ls -lah dist/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            dist/*
