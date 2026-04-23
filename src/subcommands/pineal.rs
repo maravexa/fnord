@@ -87,11 +87,11 @@ impl PinealMetrics {
 /// same helpers used by `pope`/`oracle`.
 pub fn collect_metrics() -> PinealMetrics {
     let mut sys = System::new_with_specifics(
-        RefreshKind::new()
+        RefreshKind::nothing()
             .with_cpu(CpuRefreshKind::everything())
             .with_memory(MemoryRefreshKind::everything()),
     );
-    sys.refresh_cpu();
+    sys.refresh_cpu_all();
     sys.refresh_memory();
 
     let host = System::host_name().unwrap_or_else(hostname);
