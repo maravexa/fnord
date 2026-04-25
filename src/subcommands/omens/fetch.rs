@@ -19,26 +19,18 @@ pub fn fetch_weather(location: &str) -> Result<WeatherReading, FnordError> {
 
     let url = WTTR_URL_FMT.replacen("{}", &encode_location(location), 1);
 
-    let client = reqwest::blocking::Client::builder()
+    let body = ureq::get(&url)
         .timeout(Duration::from_secs(5))
-        .user_agent("fnord (https://github.com/maravexa/fnord)")
-        .build()
-        .map_err(|e| FnordError::Parse(format!("reqwest client error: {e}")))?;
+        .set(
+            "User-Agent",
+            "fnord/0.1.2 (+https://github.com/maravexa/fnord)",
+        )
+        .call()
+        .map_err(|e| FnordError::Parse(format!("wttr.in fetch failed: {e}")))?
+        .into_string()
+        .map_err(|e| FnordError::Parse(format!("wttr.in read error: {e}")))?;
 
-    let resp = client
-        .get(&url)
-        .send()
-        .map_err(|e| FnordError::Parse(format!("wttr.in fetch failed: {e}")))?;
-
-    if !resp.status().is_success() {
-        return Err(FnordError::Parse(format!(
-            "wttr.in returned status {}",
-            resp.status()
-        )));
-    }
-
-    let json: Value = resp
-        .json()
+    let json: Value = serde_json::from_str(&body)
         .map_err(|e| FnordError::Parse(format!("wttr.in parse error: {e}")))?;
 
     parse_j1(&json, location)
@@ -133,9 +125,6 @@ mod tests {
 
     #[test]
     fn invalid_location_errors() {
-        // This test intentionally uses an obviously-bogus location. We
-        // can't guarantee offline, so we use a location reqwest will
-        // reject at the URL level.
         let err = fetch_weather("").unwrap_err();
         assert!(format!("{err}").contains("no location"));
     }
