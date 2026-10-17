@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Refresh compatible dependency patches, including the `anyhow` 1.0.104
+  unsoundness fix and `rustls` 0.23.46 TLS security fixes.
+
 - Replaced `reqwest` with `ureq` in the `omens` subcommand. Removes the
   `tokio`, `hyper`, `rustls-platform-verifier`, and `aws-lc-rs` transitive
   dependency chain (~40 crates). Fixes AUR, Nix, and other downstream
