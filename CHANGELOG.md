@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Upgrade `clap_mangen` to 0.3 with the required compatible clap patches;
+  retain the generated manual content.
+
 - Upgrade `thiserror` to 2.x while preserving error messages and sources.
 
 - Refresh compatible dependency patches, including the `anyhow` 1.0.104
