@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Upgrade `thiserror` to 2.x while preserving error messages and sources.
+
 - Refresh compatible dependency patches, including the `anyhow` 1.0.104
   unsoundness fix and `rustls` 0.23.46 TLS security fixes.
 
