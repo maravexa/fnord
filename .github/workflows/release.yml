@@ -1,5 +1,5 @@
-# NOTE: Actions are pinned to major version tags (e.g. @v4).
-# For harder supply-chain security, consider pinning to full SHA digests instead.
+# Refreshed checkout, Codecov, and download-artifact actions use immutable commits.
+# Other existing action references retain their current versions.
 
 name: Release
 
@@ -33,7 +33,7 @@ jobs:
             use_cross: true
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -90,13 +90,20 @@ jobs:
           cargo generate-rpm --target ${{ matrix.target }}
           mv target/${{ matrix.target }}/generate-rpm/*.rpm dist-rpm/
 
+      # A single upload root keeps all release assets at the archive root.
+      - name: Stage release assets
+        env:
+          TARBALL: ${{ steps.tarball.outputs.name }}
+        run: |
+          mkdir -p release-assets
+          cp "$TARBALL" dist-deb/*.deb dist-rpm/*.rpm release-assets/
+
       - uses: actions/upload-artifact@v7
         with:
           name: packages-${{ matrix.arch }}
-          path: |
-            ${{ steps.tarball.outputs.name }}
-            dist-deb/*.deb
-            dist-rpm/*.rpm
+          path: release-assets/
+          archive: true
+          if-no-files-found: error
           retention-days: 1
 
   # ── Create GitHub Release ─────────────────────────────────────────────────
@@ -105,13 +112,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
+          pattern: packages-*
           path: dist/
           merge-multiple: true
+          skip-decompress: false
+          digest-mismatch: error
 
       - name: List release artifacts
         run: ls -lah dist/
