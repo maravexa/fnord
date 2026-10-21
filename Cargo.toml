@@ -48,7 +48,7 @@ thiserror = "2"
 serde_json = "1"
 fnv = "1.0"
 ureq = { version = "2", default-features = false, features = ["tls"] }
-sysinfo = "0.38"
+sysinfo = "0.39"
 similar = "2.4"
 clap_complete = { version = "4", optional = true }
 
