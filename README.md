@@ -21,6 +21,10 @@ related to the number five.
 cargo install fn0rd
 ```
 
+Building the current source requires **Rust 1.95 or later** (sysinfo 0.39.6
+requires 1.95). The repository pins 1.95.0 for reproducible local checks.
+Older Rust versions are no longer supported by this source revision.
+
 Or from source:
 
 ```bash

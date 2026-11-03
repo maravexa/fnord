@@ -6,7 +6,7 @@ All Hail Eris. Pull requests welcome.
 
 ## Prerequisites
 
-- Rust **1.88** or later (the pinned toolchain in `rust-toolchain.toml` is picked up automatically by `rustup`)
+- Rust **1.95** or later (the pinned toolchain in `rust-toolchain.toml` is picked up automatically by `rustup`)
 - The `rustfmt` and `clippy` components — `rustup` installs them from the toolchain file, or manually:
   ```bash
   rustup component add rustfmt clippy
@@ -17,6 +17,9 @@ All Hail Eris. Pull requests welcome.
   ```
 
 ---
+
+The test matrix explicitly selects stable and beta so the pinned toolchain does
+not override those jobs. Rust 1.95.0 is tested separately as the minimum.
 
 ## Building and testing
 
@@ -81,7 +84,7 @@ Keep the subject line under 72 characters. The body is optional but appreciated 
 
 ## MSRV policy
 
-The minimum supported Rust version is **1.88**. New dependencies must build on 1.88. If you need a feature from a newer compiler, open an issue first to discuss bumping the MSRV.
+The minimum supported Rust version is **1.95**. New dependencies must build on 1.95. If you need a feature from a newer compiler, open an issue first to discuss bumping the MSRV.
 
 ---
 

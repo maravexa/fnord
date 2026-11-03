@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Raise the minimum supported Rust version to 1.95 and upgrade `sysinfo`
+  to 0.39.6; retain pineal output and similar 2.7 diff semantics.
+
 - Refresh compatible JSON, TOML, completion, and color dependencies; retain
-  similar 2.7 diff behavior and the Rust 1.88-compatible sysinfo series.
+  similar 2.7 diff behavior.
 - Update TLS certificate verification and trust roots to address
   RUSTSEC-2026-0382 and RUSTSEC-2026-0381 without relaxing supply-chain policy.
 
