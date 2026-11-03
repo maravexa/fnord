@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, codex/fnord-repair45-48]
   workflow_dispatch:
 
 concurrency:
@@ -30,8 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: 1.95.0
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
         with:
@@ -45,6 +46,8 @@ jobs:
   test:
     name: Test (${{ matrix.os }} / ${{ matrix.toolchain }})
     runs-on: ${{ matrix.os }}
+    env:
+      RUSTUP_TOOLCHAIN: ${{ matrix.toolchain }}
     strategy:
       fail-fast: false
       matrix:
@@ -59,26 +62,28 @@ jobs:
         with:
           shared-key: "test-${{ matrix.os }}-${{ matrix.toolchain }}"
       - name: Build
-        run: cargo build --workspace --all-targets --verbose
+        run: cargo build --workspace --all-targets --all-features --locked --verbose
       - name: Run tests
-        run: cargo test --workspace --all-targets --verbose
+        run: cargo test --workspace --all-targets --all-features --locked --verbose
       - name: Run doctests
         run: cargo test --workspace --doc
 
   # ── MSRV ──────────────────────────────────────────────────────────────────
   msrv:
-    name: MSRV (1.88)
+    name: MSRV (1.95)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.88
+          toolchain: 1.95.0
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "msrv"
       - name: Build on MSRV
         run: cargo build --workspace --all-features --locked
+      - name: Test on MSRV
+        run: cargo test --workspace --all-targets --all-features --locked
 
   # ── Docs ──────────────────────────────────────────────────────────────────
   docs:
@@ -86,7 +91,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "docs"
@@ -101,8 +108,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: 1.95.0
           components: llvm-tools-preview
       - uses: taiki-e/install-action@v2
         with:
@@ -126,7 +134,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-deny
@@ -142,7 +152,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "package"
@@ -163,7 +175,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "assets"
