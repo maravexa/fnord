@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Upgrade `sysinfo` to 0.40.1 while preserving pineal's JSON shape, metric
+  units, and zero/Unknown fallbacks when system information is unavailable.
+
 - Raise the minimum supported Rust version to 1.95 and upgrade `sysinfo`
   to 0.39.6; retain pineal output and similar 2.7 diff semantics.
 
