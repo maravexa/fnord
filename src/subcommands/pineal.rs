@@ -86,32 +86,45 @@ impl PinealMetrics {
 /// Collect metrics from `sysinfo`. Host and user fall back through the
 /// same helpers used by `pope`/`oracle`.
 pub fn collect_metrics() -> PinealMetrics {
-    let mut sys = System::new_with_specifics(
+    let sys = System::new_with_specifics(
         RefreshKind::nothing()
             .with_cpu(CpuRefreshKind::everything())
             .with_memory(MemoryRefreshKind::everything()),
     );
-    sys.refresh_cpu_all();
-    sys.refresh_memory();
+    metrics_from_system(sys, System::uptime(), System::load_average())
+}
 
-    let host = System::host_name().unwrap_or_else(hostname);
+// Keep sysinfo 0.39's zero-valued unavailable metrics and existing metadata
+// fallbacks. In 0.40 these cases are Results, including unsupported platforms.
+fn metrics_from_system(
+    system: Result<System, sysinfo::Error>,
+    uptime: Result<u64, sysinfo::Error>,
+    load: Result<LoadAvg, sysinfo::Error>,
+) -> PinealMetrics {
+    let mut sys = system.ok();
+    if let Some(sys) = sys.as_mut() {
+        sys.refresh_cpu_all();
+        sys.refresh_memory();
+    }
+
+    let host = System::host_name().unwrap_or_else(|_| hostname());
     let user = current_user();
-    let os_name = System::name().unwrap_or_else(|| "Unknown".to_string());
-    let os_version = System::os_version().unwrap_or_else(|| "Unknown".to_string());
-    let kernel_version = System::kernel_version().unwrap_or_else(|| "Unknown".to_string());
+    let os_name = System::name().unwrap_or_else(|_| "Unknown".to_string());
+    let os_version = System::os_version().unwrap_or_else(|_| "Unknown".to_string());
+    let kernel_version = System::kernel_version().unwrap_or_else(|_| "Unknown".to_string());
 
-    let cpus = sys.cpus();
+    let cpus = sys.as_ref().map(System::cpus).unwrap_or_default();
     let core_count = cpus.len();
     let cpu_model = cpus
         .first()
         .map(|c| c.brand().to_string())
         .unwrap_or_else(|| "Unknown CPU".to_string());
-    let per_cpu_usage: Vec<f32> = cpus.iter().map(|c| c.cpu_usage()).collect();
+    let per_cpu_usage: Vec<f32> = cpus.iter().map(|c| c.usage()).collect();
 
-    let total_ram_bytes = sys.total_memory();
-    let used_ram_bytes = sys.used_memory();
-    let uptime_seconds = System::uptime();
-    let LoadAvg { one, five, fifteen } = System::load_average();
+    let total_ram_bytes = sys.as_ref().map_or(0, System::total_memory);
+    let used_ram_bytes = sys.as_ref().map_or(0, System::used_memory);
+    let uptime_seconds = uptime.unwrap_or_default();
+    let LoadAvg { one, five, fifteen } = load.unwrap_or_default();
 
     PinealMetrics {
         host,
@@ -429,6 +442,47 @@ fn assessment_line(level: i32) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unavailable_system_metrics_preserve_zero_and_unknown_values() {
+        let metrics = metrics_from_system(
+            Err(sysinfo::Error::Unsupported),
+            Err(sysinfo::Error::Unsupported),
+            Err(sysinfo::Error::Unsupported),
+        );
+        assert_eq!(metrics.cpu_model, "Unknown CPU");
+        assert_eq!(metrics.core_count, 0);
+        assert!(metrics.per_cpu_usage.is_empty());
+        assert_eq!(metrics.total_ram_bytes, 0);
+        assert_eq!(metrics.used_ram_bytes, 0);
+        assert_eq!(metrics.ram_used_pct(), 0.0);
+        assert_eq!(metrics.uptime_seconds, 0);
+        assert_eq!(
+            (metrics.load_1m, metrics.load_5m, metrics.load_15m),
+            (0.0, 0.0, 0.0)
+        );
+        assert!((0..=100).contains(&consciousness_level(&metrics)));
+    }
+
+    #[test]
+    fn unavailable_cpu_and_memory_do_not_discard_available_uptime_or_load() {
+        let metrics = metrics_from_system(
+            Err(sysinfo::Error::Unsupported),
+            Ok(86_400),
+            Ok(LoadAvg {
+                one: 0.5,
+                five: 1.5,
+                fifteen: 2.5,
+            }),
+        );
+        assert_eq!(metrics.uptime_seconds, 86_400);
+        assert_eq!(
+            (metrics.load_1m, metrics.load_5m, metrics.load_15m),
+            (0.5, 1.5, 2.5)
+        );
+        assert_eq!(metrics.core_count, 0);
+        assert_eq!(metrics.total_ram_bytes, 0);
+    }
 
     fn base_metrics() -> PinealMetrics {
         PinealMetrics {
